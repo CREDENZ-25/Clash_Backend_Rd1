@@ -2,7 +2,7 @@ const express = require('express');
 //initial commit by akanksha
 const dotenv = require('dotenv');
 // const userRoutes = require('./routes/userRoutes');
-
+const cors=require('cors');
 dotenv.config();
 
 const app = express();
