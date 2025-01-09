@@ -1,5 +1,8 @@
-const express = require('express');
-const dotenv = require('dotenv');
+// const express = require('express');
+// const dotenv = require('dotenv');
+import dotenv from 'dotenv';
+
+
 // const userRoutes = require('./routes/userRoutes');
 
 dotenv.config();
@@ -11,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-// app.use('/api', userRoutes);
+app.use('/api', userRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 5000;
