@@ -1,9 +1,25 @@
-const express = require('express');
-const dotenv = require('dotenv');
-// const userRoutes = require('./routes/userRoutes');
-const cors=require('cors');
+import express from "express";
+import dotenv from "dotenv";
+import { Sequelize } from "sequelize";
+import {Clash, initClashModel} from './models/User.js'
 
 dotenv.config();
+
+const{DB_HOST,DB_USER,DB_DB, DB_PASS } = process.env;
+    const sequelize = new Sequelize(DB_DB, DB_USER, DB_PASS,{
+        host: DB_HOST,
+        dialect: 'postgres',
+    });
+
+
+    sequelize
+    .authenticate()
+    .then(async ()=> {console.log('Connected');
+    await initClashModel(sequelize); // Call the function to initialize the model
+    
+     
+})
+    .catch(console.error);
 
 const app = express();
 
