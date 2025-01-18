@@ -1,8 +1,17 @@
+<<<<<<< HEAD
 import express from "express";
 import dotenv from "dotenv";
 import { Sequelize } from "sequelize";
 //import {MCQ, initMCQmodel} from './models/mcq.js';
 import {Clash, initClashModel} from './models/User.js';
+=======
+const express = require('express');
+const dotenv = require('dotenv');
+// const userRoutes = require('./routes/userRoutes');
+const cors=require('cors');
+
+dotenv.config();
+>>>>>>> 70e9235cce44ca1ccc0febc2a62f058b5215811f
 
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
