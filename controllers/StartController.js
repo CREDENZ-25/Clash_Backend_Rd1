@@ -1,4 +1,4 @@
-// Route to start the test
+const { progress } = require('../models');
 const startTest= async (req, res) => {
    
 /*
