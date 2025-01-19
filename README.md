@@ -4,8 +4,7 @@ Working of the System
 1.Fetching Questions and Options
 
 When the user starts the test, the system fetches the list of questions based on the question_array stored in the Progress table for the user.
-The Questions table is connected to the Options table through a one-to-many relationship, so the corresponding options for each question are also fetched automatically.
-
+The Questions table will fetch all the questions .
 2.Timer Initialization
 When the user presses the "Start" button, the timer begins, and the start time is recorded in the Progress table.
 
