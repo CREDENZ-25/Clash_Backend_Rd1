@@ -9,8 +9,7 @@ The Questions table will fetch all the questions .
 When the user presses the "Start" button, the timer begins, and the start time is recorded in the Progress table.
 
 3.Question Navigation
-The first question is displayed to the user. After the user submits their answer, the system fetches the next question according to the question_array in the Progress table.
-This process continues for each question until either time limit is reached.
+what we are selecting all the questions on the basis of array created in the progress table, converting them in json ane sending to frontend , them frontend will fetch and show to the user and add the question id and the selected option of the user and then convert them in object and return
 
-Automatic Submission
+4.Automatic Submission
 If the time limit is reached the test is automatically submitted,and the system evaluates the answers provided by the user up to that point. The correct_answers_count is updated accordingly
