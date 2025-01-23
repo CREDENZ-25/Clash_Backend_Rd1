@@ -1,6 +1,6 @@
 //id question answer category 
 
-import {STRING , INTEGER , ENUM , TEXT , Model, Sequelize,ARRAY, BOOLEAN} from 'sequelize';
+import {STRING , INTEGER , ENUM , TEXT , Model, Sequelize,ARRAY, BOOLEAN, DataTypes} from 'sequelize';
 
 class MCQ extends Model{};
 
@@ -16,17 +16,19 @@ const initMCQmodel=sequelize=>{
             allowNull:false,
             
         },
-        answer:{
-            type:STRING,
+        options:{
+            type:DataTypes.ARRAY(DataTypes.STRING),
             allowNull:false
         },
-        options:{
-            type:ARRAY,
+        correct:{
+            type:INTEGER,
             allowNull:false,
-         },
+            validate: {
+                isIn: [[0, 1, 2, 3]] // Sequelize's validation for allowed values
+            }
+        },
         isJunior:{
             type:BOOLEAN,
-            allowNull:false,
         }
 
 
