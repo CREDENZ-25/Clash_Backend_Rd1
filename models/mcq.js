@@ -17,7 +17,7 @@ const initMCQmodel=sequelize=>{
             
         },
         options:{
-            type:DataTypes.ARRAY(DataTypes.STRING),
+            type:DataTypes.ARRAY(DataTypes.INTEGER),
             allowNull:false
         },
         correct:{
