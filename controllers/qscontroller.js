@@ -64,8 +64,22 @@ async function fetchCounterByUser(user) {
          userid: user.id, 
        },
      });
- 
+
+
+     
       if(counter){
+        const currentCounter=counter;
+
+        const updated_counter = currentCounter + 1;
+        await Progress.update(
+          {counter : updated_counter},
+          {
+            where:{
+              userid:user.id,
+            }
+          }
+          
+        )
         return counter;
       }
    } catch (error) {
