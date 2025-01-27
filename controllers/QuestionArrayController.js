@@ -2,33 +2,40 @@ const { progress, question } = require('../models'); // Assuming you have Sequel
 
 const addQuestion = async (req, res) => {
   /*
-    This code defines a route to add a set of random questions to the user's progress.
-    It retrieves all random questions from the Question table using Sequelize, 
-    and then inserts these questions into the Progress table along with the user's ID.
-    Once the questions are successfully added, it sends a response indicating that the quiz has started.
-    If any error occurs during the process, a 500 status with an error message is returned.
+    This code adds random questions to the user's progress, filtering by category (junior/senior).
+    It fetches `id` and `correct_option` for the selected questions and saves them 
+    in the `Progress` table along with the user's ID and category.
   */
 
-  const { userId } = req.body;
-try{
-  const questions = await question.findAll({
-    attributes: ['id'], 
-    order: Sequelize.literal('rand()'),
-  });
+  const { userId, category } = req.body;
 
-  const questionIds = questions.map((q) => q.id);
- 
-  const progress = await progress.create({
-    user_id: userId,
-    questionsArray: JSON.stringify(questionIds), 
-  });
-  
+  try {
+
+    const isJunior = category.toLowerCase() === 'junior';
+
+    const questions = await question.findAll({
+      attributes: ['id', 'correct_option'], 
+      where: { isJunior }, 
+      order: Sequelize.literal('rand()'), 
+    });
+
+    const questionIds = questions.map((q) => q.id);
+    const correctAnswers = questions.map((q) => q.correct_option);
+
+    await progress.create({
+      user_id: userId,
+      questionsArray: JSON.stringify(questionIds), 
+      Correctans: JSON.stringify(correctAnswers), 
+      category, 
+    });
+
     res.status(200).json({
       status: 'Quiz started',
+      category,
     });
   } catch (error) {
     console.error('Error starting quiz:', error);
-    res.status(500).json({ error: 'from QuestionArray' });
+    res.status(500).json({ error: 'Error adding questions to progress' });
   }
 };
 

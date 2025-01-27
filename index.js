@@ -7,7 +7,8 @@ const questionRoutes = require('./routes/questionRoute.js');
 
 
 // const userRoutes = require('./routes/userRoutes');
-//Let's Go
+const cors=require('cors');
+
 dotenv.config();
 
 const app = express();
