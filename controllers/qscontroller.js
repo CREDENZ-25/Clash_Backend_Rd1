@@ -8,8 +8,9 @@ const app = express();
 app.use(cookieParser());
 
  app.post('/next-button',async(req,res)=>{
-
-  try{
+      const {answer} = req.body.answer;
+      
+    try{
     const token = req.cookies.token;
         
     if(!token){
@@ -24,12 +25,52 @@ app.use(cookieParser());
 
     const final_counter=await fetchCounterByUser(user);
     const final_qarray= await fetchQuestionByUser(user);
-    const final_option_array= await fetchOptionsbyUser(user);
+    const selected_ans=await fetchAnswerByUser(user);
+    const correct_ans=await fetchCorrectAnsByUser(user);
 
+    const check=final_counter-1;
+    try{
+      selected_ans[check]=answer;
+      Progress.update(
+        {Selectedans: selected_ans},
+        {
+          where:{
+            userid:user.id
+          }
+        }
+      )
+      if(selected_ans[check]=== correct_ans[check]){
+        Progress.update(
+          {Marks : Marks + 4 },
+          {
+            where:{
+              userid:user.id
+            }
+          }
+          
+        )
+      }
+      else{
+        Progress.update(
+          {Marks : Marks - 1 },
+          {
+            where:{
+              userid:user.id
+            }
+          }
+          
+        )
+      }
+    }catch(error){
+      console.log("unable to update", error);
+    }
+
+   // const final_option_array= await fetchOptionsbyUser(user);
+   
     const qid=final_qarray[final_counter];
 
-    const question=await MCQ.findOne({
-      attributes:['questions'],
+    const question_data=await MCQ.findOne({
+      attributes:['questions','options'],
       where:{
         id:qid
       }
@@ -40,8 +81,7 @@ app.use(cookieParser());
     }
 
     return res.status(200).json({
-      question: question,
-      options: final_option_array,
+      question_data
     });
 
   }catch(error){
@@ -50,7 +90,6 @@ app.use(cookieParser());
   }
         
  })
-
 
 
 
@@ -80,7 +119,7 @@ async function fetchCounterByUser(user) {
           }
           
         )
-        return counter;
+        return updated_counter;
       }
    } catch (error) {
      console.error('Error getting counter:', error);
@@ -108,8 +147,50 @@ async function fetchCounterByUser(user) {
       throw error;
     }
   }
+
 //3)
-async function fetchOptionsbyUser(user)
+async function fetchAnswerByUser(user) {
+  try {
+    const ansarray = await Progress.findOne({
+      attributes: ['Selectedans'], 
+      where: {
+        userid: user.id,
+      },
+      
+    });
+
+    if (ansarray) {
+     return ansarray;
+      
+    }
+  } catch (error) {
+    console.error('cannot store selected ans', error);
+    throw error;
+  }
+}
+
+//4)
+async function fetchCorrectAnsByUser(user) {
+  try {
+    const correctans = await Progress.findOne({
+      attributes: ['Correctans'], 
+      where: {
+        userid: user.id,
+      },
+      
+    });
+
+    if (correctans) {
+     return correctans;
+      
+    }
+  } catch (error) {
+    console.error('Error getting correct ans', error);
+    throw error;
+  }
+}
+//3)
+/*async function fetchOptionsbyUser(user)
   {
     try{
       const optionarray=await MCQ.findOne({
@@ -130,4 +211,4 @@ async function fetchOptionsbyUser(user)
     }
     
   }
- 
+ */
