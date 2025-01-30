@@ -11,16 +11,20 @@ const initUserModel = sequelize => {
                 autoIncrement: true,
 
             },
-        email:{
+            email:{
             type: DataTypes.STRING,
             allowNull: false,
             unique: true,
 
         },
-        password: {
+            password: {
             type: DataTypes.STRING,
             allowNull: false,
 
+        },
+            isJunior:{
+            type:DataTypes.BOOLEAN,
+            allowNull: false,
         }
         }
    ,{sequelize} );

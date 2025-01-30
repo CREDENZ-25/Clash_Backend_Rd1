@@ -4,7 +4,7 @@ import {STRING , INTEGER , ENUM , TEXT , Model, Sequelize,ARRAY, BOOLEAN, DataTy
 
 class MCQ extends Model{};
 
-const initMCQmodel=sequelize=>{
+const initMCQModel=sequelize=>{
     MCQ.init({
         id:{
             type:INTEGER,
@@ -17,18 +17,18 @@ const initMCQmodel=sequelize=>{
             
         },
         options:{
-            type:DataTypes.ARRAY(DataTypes.INTEGER),
+            type:DataTypes.ARRAY(DataTypes.STRING),
             allowNull:false
         },
         correct:{
-            type:INTEGER,
+            type:DataTypes.INTEGER,
             allowNull:false,
             validate: {
                 isIn: [[0, 1, 2, 3]] // Sequelize's validation for allowed values
             }
         },
         isJunior:{
-            type:BOOLEAN,
+            type:DataTypes.BOOLEAN,
         }
 
 
@@ -41,4 +41,4 @@ const initMCQmodel=sequelize=>{
     .catch(()=>console.log("table not created" , err));
 };
 
-export default(MCQ, initMCQmodel);
+export {MCQ, initMCQModel};

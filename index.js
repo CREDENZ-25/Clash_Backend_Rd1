@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { Sequelize, DataTypes, Model  } from "sequelize";
-//import {MCQ, initMCQmodel} from './models/mcq.js';
+import {MCQ, initMCQModel} from './models/mcq.js';
 import {User, initUserModel} from './models/User.js';
 import {Progress, initProgressModel} from './models/progress.js';
 import jwt from 'jsonwebtoken';
@@ -20,7 +20,7 @@ const{DB_HOST,DB_USER,DB_DB, DB_PASS } = process.env;
     .then(async ()=> {console.log('Connected');
       await initUserModel(sequelize);
      await initProgressModel(sequelize); // Call the function to initialize the model
-     
+     await initMCQModel(sequelize);
      
 })
     .catch(console.error);
@@ -39,7 +39,12 @@ app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ where: { email } });
+    const user=await User.findOne({
+          attributes:['password','id','isJunior'],
+          where:{
+            email:email,
+          }
+        })
 
     if (!user) {
         return res.status(404).json({ message: 'User not found!' });
@@ -51,14 +56,14 @@ app.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Password is incorrect!' });
     }
 
-    const token = jwt.sign({ userId: user.id }, 'your_secret_key', { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user.id ,category: user.isJunior}, 'your_secret_key', { expiresIn: '1h' });
     res.cookie('token', token, {
       httpOnly: true,  // Helps to prevent XSS attacks
       secure: process.env.NODE_ENV === 'production',  // Set to true if using HTTPS in production
       maxAge: 3600000,  // Optional: expires in 1 hour
     });
-    
-   return res.status(200).json({ message: 'Login successful' });
+
+    return res.status(200).json({ message: 'Login successful' });
     
   } catch (error) {
     console.error('Error during login:', error);

@@ -27,6 +27,9 @@ const initProgressModel = sequelize => {
         },
         isJunior:{
             type:BOOLEAN
+        },
+        start_timer:{
+            type:DataTypes.DATE,
         }
         }
    ,{sequelize} );

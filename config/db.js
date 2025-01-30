@@ -4,8 +4,8 @@ require('dotenv').config();
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
-  database: 'SIH_BE',
-  password: 'pg1912',
+  database: 'postgres',
+  password: 'forever4-5',
   port: 5432,
 });
 
