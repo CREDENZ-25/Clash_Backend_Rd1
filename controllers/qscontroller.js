@@ -23,25 +23,26 @@ app.use(cookieParser());
       return res.status(400).json({message:"error"});
     }
 
-    const final_counter=await fetchCounterByUser(user);
-    const final_qarray= await fetchQuestionByUser(user);
-    const selected_ans=await fetchAnswerByUser(user);
-    const correct_ans=await fetchCorrectAnsByUser(user);
+    //1)
+    const userData= await Progress.findOne({
+        attributes: ['counter','Questionsid','Selectedans','Correctans'], 
+        where: {
+          userid: user.id, 
+        },
+    }
+    )
+    
+  
 
-    const check=final_counter-1;
+    const selected_ans=userData.Selectedans;
+    const correct_ans=userData.Correctans;
+
+    const check=userData.counter;
     try{
       selected_ans[check]=answer;
-      Progress.update(
-        {Selectedans: selected_ans},
-        {
-          where:{
-            userid:user.id
-          }
-        }
-      )
       if(selected_ans[check]=== correct_ans[check]){
         Progress.update(
-          {Marks : Marks + 4 },
+          {Marks : Marks + 4 ,Selectedans: selected_ans, counter:check+1 },
           {
             where:{
               userid:user.id
@@ -52,7 +53,7 @@ app.use(cookieParser());
       }
       else{
         Progress.update(
-          {Marks : Marks - 1 },
+          {Marks : Marks - 1 ,Selectedans: selected_ans, counter:check+1 },
           {
             where:{
               userid:user.id
@@ -67,7 +68,7 @@ app.use(cookieParser());
 
    // const final_option_array= await fetchOptionsbyUser(user);
    
-    const qid=final_qarray[final_counter];
+    const qid=userData.Questionsid[check+1];
 
     const question_data=await MCQ.findOne({
       attributes:['questions','options'],
@@ -76,7 +77,7 @@ app.use(cookieParser());
       }
     })
 
-    if (!question) {
+    if (!question_data) {
       return res.status(404).json({ message: "Question not found" });
     }
 
@@ -90,125 +91,3 @@ app.use(cookieParser());
   }
         
  })
-
-
-
-
-//1
-async function fetchCounterByUser(user) {
-   try {
-     const counter = await Progress.findOne({
-       attributes: ['counter'], 
-       where: {
-         userid: user.id, 
-       },
-     });
-
-
-     
-      if(counter){
-        const currentCounter=counter;
-
-        const updated_counter = currentCounter + 1;
-        await Progress.update(
-          {counter : updated_counter},
-          {
-            where:{
-              userid:user.id,
-            }
-          }
-          
-        )
-        return updated_counter;
-      }
-   } catch (error) {
-     console.error('Error getting counter:', error);
-     throw error;
-   }
- }
-
- //2
- async function fetchQuestionByUser(user) {
-    try {
-      const qarray = await Progress.findOne({
-        attributes: ['Questionsid'], 
-        where: {
-          userid: user.id,
-        },
-        
-      });
-  
-      if (qarray) {
-       return qarray;
-        
-      }
-    } catch (error) {
-      console.error('Error getting counter:', error);
-      throw error;
-    }
-  }
-
-//3)
-async function fetchAnswerByUser(user) {
-  try {
-    const ansarray = await Progress.findOne({
-      attributes: ['Selectedans'], 
-      where: {
-        userid: user.id,
-      },
-      
-    });
-
-    if (ansarray) {
-     return ansarray;
-      
-    }
-  } catch (error) {
-    console.error('cannot store selected ans', error);
-    throw error;
-  }
-}
-
-//4)
-async function fetchCorrectAnsByUser(user) {
-  try {
-    const correctans = await Progress.findOne({
-      attributes: ['Correctans'], 
-      where: {
-        userid: user.id,
-      },
-      
-    });
-
-    if (correctans) {
-     return correctans;
-      
-    }
-  } catch (error) {
-    console.error('Error getting correct ans', error);
-    throw error;
-  }
-}
-//3)
-/*async function fetchOptionsbyUser(user)
-  {
-    try{
-      const optionarray=await MCQ.findOne({
-        attributes:['options'],
-        where:{
-          userid : user.id,
-        },
-      })
-
-        if(optionarray){
-          return optionarray;
-        }
-
-    
-    }catch(error){
-      console.log(error);
-      throw error;
-    }
-    
-  }
- */
