@@ -29,11 +29,8 @@ const initMCQModel=sequelize=>{
         },
         isJunior:{
             type:DataTypes.INTEGER,
-        }
-
-
-
-
+        },
+       
     }, {sequelize});
 
     

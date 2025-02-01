@@ -1,5 +1,4 @@
 import { Model, DataTypes} from "sequelize";
-
 class User extends Model{}
 
 const initUserModel = sequelize => {
@@ -25,7 +24,8 @@ const initUserModel = sequelize => {
             isJunior:{
             type:DataTypes.BOOLEAN,
             allowNull: false,
-        }
+        },
+        
         }
    ,{sequelize} );
 

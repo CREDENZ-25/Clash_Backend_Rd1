@@ -7,6 +7,7 @@ import {Progress, initProgressModel} from './models/progress.js';
 import cors from 'cors';
 import {login} from './controllers/logincontroller.js';
 import {start} from './controllers/startcontroller.js';
+import {nextbutton} from './controllers/qscontroller.js';
 import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
 dotenv.config();
@@ -16,6 +17,7 @@ const{DB_HOST,DB_USER,DB_DB, DB_PASS } = process.env;
     const sequelize = new Sequelize(DB_DB, DB_USER, DB_PASS,{
         host: DB_HOST,
         dialect: 'postgres',
+       
     });
 
     sequelize
@@ -47,7 +49,8 @@ app.use(cookieParser());
 
     login();
     start();
-
+    nextbutton();
+    
 
 // Start the server
 const PORT = process.env.PORT || 5000;
