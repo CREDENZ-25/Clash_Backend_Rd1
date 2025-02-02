@@ -12,6 +12,7 @@ import cookieParser from 'cookie-parser';
 
 
 async function start() {
+    
     app.get('/start', async (req,res)=>{
         console.log("hi");
      try{
@@ -67,9 +68,25 @@ async function start() {
              },
              raw:true,
          })
-         
+         var timeleft=0;
+         const timedata= await Progress.findOne({
+            attributes :['createdAt' , 'updatedAt'],
+            where:{
+              userid: userId,
+            },
+            raw:true,
+         })
+         console.log(timedata.createdAt );
+         console.log(timedata.updatedAt) ;
+         timeleft=1800 - ((timedata.updatedAt)-(timedata.createdAt)) ;
+
+         console.log(timeleft);
          return res.status(200).json(
-             qaObject
+          {
+            questiondata: qaObject,
+            timedata:timeleft
+          }
+            
          )
      
      

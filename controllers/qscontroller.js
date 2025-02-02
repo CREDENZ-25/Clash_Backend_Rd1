@@ -38,7 +38,7 @@ async function nextbutton() {
   //1)
   
     const userData= await Progress.findOne({
-      attributes: ['Counter','Questionsid','Selectedans','Correctans','Marks'], 
+      attributes: ['Counter','Questionsid','Selectedans','Correctans','Marks','createdAt'], 
       where: {
         userid: user.userId, 
       },
@@ -99,10 +99,27 @@ async function nextbutton() {
   if (!question_data) {
     return res.status(404).json({ message: "Question not found" });
   }
+        
+         var float_time=0;
+        
+         console.log(userData.createdAt );
+         const datetime = userData.createdAt; // Example datetime string
+         const created= new Date(datetime).getTime();
+         const updated = Date.now();
 
-  return res.status(200).json({
-    question_data
-  });
+         console.log(created );
+         console.log(updated);
+         float_time= 1800 - ((updated)-(created))/1000 ;
+         var timeleft = Math.round( float_time );
+         console.log(timeleft);
+         
+         console.log("minutes:" , Math.floor(timeleft/60));
+         console.log("seconds:" , timeleft%60);
+
+     return res.status(200).json({
+            nextquestion:question_data,
+            timedata:timeleft
+         });
 
 }catch(error){
   res.status(400).json({message:"error fetching question for this user!"});

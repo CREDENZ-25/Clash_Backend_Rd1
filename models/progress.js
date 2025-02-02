@@ -28,6 +28,7 @@ const initProgressModel = sequelize => {
         isJunior:{
             type:BOOLEAN
         },
+        
         }
    ,{sequelize} );
    Progress.belongsTo(User, {
