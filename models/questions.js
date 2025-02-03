@@ -6,22 +6,29 @@ export const question = (sequelize) => {
       autoIncrement: true,
       primaryKey: true,
     },
-    questionText: {
+    question: {
       type: DataTypes.STRING,
-      allowNull: false, 
+      allowNull: false,
     },
-    optionArray: {
+    options: {
       type: DataTypes.ARRAY(DataTypes.STRING),
-      allowNull: false, 
+      allowNull: false,
     },
-    answerIdx: {
+    correct: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      validate: {
+        isIn: [[0, 1, 2, 3]] // Sequelize's validation for allowed values
+      }
     },
     isJunior: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+  },
+  {
+    tableName: 'questions', 
+    timestamps: false,  
   });
 };
-
+export default question
