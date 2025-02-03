@@ -4,94 +4,70 @@ import User from '../models/User';
 import express from "express";
 import cookieParser from 'cookie-parser';
 
-const app = express();
 app.use(cookieParser());
 
- app.post('/next-button',async(req,res)=>{
-      const {answer} = req.body.answer;
-      
-    try{
-    const token = req.cookies.token;
-        
-    if(!token){
-     return res.status(400).json({message:"error"});
-    }
+const nextButtonHandler = async (req, res) => {
+  const { answer } = req.body;  // Extract answer from request body
+  
+  try {
+      const user = req.user;  // Access the authenticated user from req.user
+      const final_counter = await fetchCounterByUser(user);
+      const final_qarray = await fetchQuestionByUser(user);
+      const selected_ans = await fetchAnswerByUser(user);
+      const correct_ans = await fetchCorrectAnsByUser(user);
 
-    const user= jwt.verify(token , 'your_secret_key');
+      const check = final_counter - 1;
+      try {
+          selected_ans[check] = answer;
+          await Progress.update(
+              { Selectedans: selected_ans },
+              {
+                  where: {
+                      userid: user.id
+                  }
+              }
+          );
 
-    if(!user){
-      return res.status(400).json({message:"error"});
-    }
-
-    const final_counter=await fetchCounterByUser(user);
-    const final_qarray= await fetchQuestionByUser(user);
-    const selected_ans=await fetchAnswerByUser(user);
-    const correct_ans=await fetchCorrectAnsByUser(user);
-
-    const check=final_counter-1;
-    try{
-      selected_ans[check]=answer;
-      Progress.update(
-        {Selectedans: selected_ans},
-        {
-          where:{
-            userid:user.id
+          if (selected_ans[check] === correct_ans[check]) {
+              await Progress.update(
+                  { Marks: Marks + 4 },
+                  {
+                      where: {
+                          userid: user.id
+                      }
+                  }
+              );
+          } else {
+              await Progress.update(
+                  { Marks: Marks - 1 },
+                  {
+                      where: {
+                          userid: user.id
+                      }
+                  }
+              );
           }
-        }
-      )
-      if(selected_ans[check]=== correct_ans[check]){
-        Progress.update(
-          {Marks : Marks + 4 },
-          {
-            where:{
-              userid:user.id
-            }
+      } catch (error) {
+          console.log("Unable to update", error);
+      }
+
+      const qid = final_qarray[final_counter];
+      const question_data = await MCQ.findOne({
+          attributes: ['questions', 'options'],
+          where: {
+              id: qid
           }
-          
-        )
+      });
+
+      if (!question_data) {
+          return res.status(404).json({ message: "Question not found" });
       }
-      else{
-        Progress.update(
-          {Marks : Marks - 1 },
-          {
-            where:{
-              userid:user.id
-            }
-          }
-          
-        )
-      }
-    }catch(error){
-      console.log("unable to update", error);
-    }
 
-   // const final_option_array= await fetchOptionsbyUser(user);
-   
-    const qid=final_qarray[final_counter];
-
-    const question_data=await MCQ.findOne({
-      attributes:['questions','options'],
-      where:{
-        id:qid
-      }
-    })
-
-    if (!question) {
-      return res.status(404).json({ message: "Question not found" });
-    }
-
-    return res.status(200).json({
-      question_data
-    });
-
-  }catch(error){
-    res.status(400).json({message:"error fetching question for this user!"});
-
+      return res.status(200).json({ question_data });
+  } catch (error) {
+      res.status(400).json({ message: "Error fetching question for this user!" });
   }
-        
- })
-
-
+};
 
 
 //1
@@ -212,3 +188,10 @@ async function fetchCorrectAnsByUser(user) {
     
   }
  */
+module.exports={
+  fetchCounterByUser,
+  fetchQuestionByUser,
+  fetchAnswerByUser,
+  fetchCorrectAnsByUser,
+  nextButtonHandler
+}

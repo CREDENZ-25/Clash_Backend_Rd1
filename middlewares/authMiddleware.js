@@ -15,5 +15,23 @@ const authMiddleware = (req, res, next) => {
         return res.status(401).json({ message: 'Invalid token.' });
     }
 };
+/*async function getUser(){
+    try{
+        const token = req.cookies.token;
+            
+        if(!token){
+         return res.status(400).json({message:"error"});
+        }
+    
+        const user= jwt.verify(token , 'your_secret_key');
+    
+        if(!user){
+          return res.status(400).json({message:"error"});
+        }
+    }catch(error){
+        console.log("Starting user error", error)
+    };
+    
+}*/
 
 module.exports = authMiddleware;
