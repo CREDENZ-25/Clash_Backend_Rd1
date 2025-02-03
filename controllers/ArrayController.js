@@ -7,7 +7,8 @@ const addQuestion = async (req, res) => {
     in the `Progress` table along with the user's ID and category.
   */
 
-  const { userId, category } = req.body;
+   ;
+  const { category } = req.body;
 
   try {
 
@@ -34,6 +35,7 @@ const addQuestion = async (req, res) => {
       category,
     });
   } catch (error) {
+
     console.error('Error starting quiz:', error);
     res.status(500).json({ error: 'Error adding questions to progress' });
   }

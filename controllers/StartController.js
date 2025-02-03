@@ -29,35 +29,10 @@
 //   };
 //   module.exports = startTest;
 import Progress from '../models/progress.js';
-import express from "express";
-import cookieParser from 'cookie-parser';
 
-const app = express();
-app.use(cookieParser());
-   
-async function getUser(){
+const startQuizHandler= async (req,res)=>{
     try{
-        const token = req.cookies.token;
-            
-        if(!token){
-         return res.status(400).json({message:"error"});
-        }
-    
-        const user= jwt.verify(token , 'your_secret_key');
-    
-        if(!user){
-          return res.status(400).json({message:"error"});
-        }
-        return user.id;
-    }catch(error){
-        console.log("Starting user error", error)
-    };
-    
-}
-
-app.get('/start', async (req,res)=>{
-    try{
-        const user_id = getUser();
+        const user_id = req.user.id;
         const qidarray= await Progress.findOne({
             attributes: ['Questionsid'],
             where:{
@@ -80,4 +55,6 @@ app.get('/start', async (req,res)=>{
     }catch(error){
         console.log("Error sending first question",error);
     }}
-)
+module.exports={
+    startQuizHandler
+}
