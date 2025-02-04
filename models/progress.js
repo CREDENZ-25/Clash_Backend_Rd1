@@ -1,5 +1,4 @@
 import { DataTypes } from "sequelize";
-import { UserModel } from '../config/db.js';
 const Progress = (sequelize) => {
   const ProgressModel = sequelize.define("Progress", {
     Questionsid: {
@@ -20,15 +19,10 @@ const Progress = (sequelize) => {
     isJunior: {
       type: DataTypes.BOOLEAN,
     },
-    userid: {  // Add userid column for foreign key
+    userid: { 
       type: DataTypes.INTEGER,
-      // references: {
-      //   model: UserModel, // Name of the Users table
-      //   key: 'userid',  // Column name in the Users table
-      // },
     }
   });
-  // Define associations correctly
   return ProgressModel;
 };
 export default Progress;

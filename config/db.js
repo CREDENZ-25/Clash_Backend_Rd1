@@ -20,8 +20,6 @@ const UserModel = User(sequelize);
 const ProgressModel = Progress(sequelize); 
 const QuestionModel = question(sequelize);
 
-// UserModel.hasOne(ProgressModel , { foreignKey: 'userid'});
-// ProgressModel.belongsTo(UserModel, { foreignKey: 'userid' });
 
 // Sync models with DB
 async function syncDatabase() {

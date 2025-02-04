@@ -17,9 +17,9 @@ app.use(express.json({strict:false}));
 app.use(express.urlencoded({ extended: true }));
 
 
-app.get('/start',authMiddleware,startController);
-app.post('/next',authMiddleware,qscontroller);
-app.post('/login', loginRoutes);
+app.use('/start',authMiddleware,startController);
+app.use('/next',authMiddleware,qscontroller);
+app.use('/login', loginRoutes);
 
 app.get('/', (req, res) => {
   res.send('Server is up and running!');

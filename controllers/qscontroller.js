@@ -2,9 +2,11 @@ import { QuestionModel } from "../config/db.js";
 import { ProgressModel } from "../config/db.js";
 
 const next = async (req, res) => {
-  console.log("NEXT!!!");
-  const answer = req.body.answer;
-
+  // console.log("NEXT!!!");
+  const answer = req.body.answer;  
+  if(answer==null){
+    return res.status(500).json({error:"Error Null Value"});
+  }
   try {
     const userId = req.user.userId;
     if (!userId) {
@@ -14,7 +16,7 @@ const next = async (req, res) => {
     let userData;
     try {
       userData = await ProgressModel.findOne({
-        attributes: ["Counter", "Questionsid", "Selectedans", "Correctans", "Marks"],
+        attributes: ["Counter", "Questionsid", "Selectedans", "Correctans", "Marks","createdAt"],
         where: {
           userid: userId,
         },
@@ -34,9 +36,9 @@ const next = async (req, res) => {
     const counter = userData.Counter;
     const Marks = userData.Marks;
 
-    console.log(correct_array, selected_array, question_array, counter);
+    // console.log(correct_array, selected_array, question_array, counter);
     const check = correct_array[counter];
-    console.log(check);
+    // console.log(check);
 
     try {
       if (check === answer) {
@@ -71,7 +73,31 @@ const next = async (req, res) => {
       return res.status(500).json({ message: "Error fetching next question" });
     }
 
-    return res.status(200).json({ question_data });
+    //time update Logic
+
+    var float_time=0;
+        
+      const datetime = userData.createdAt; 
+      console.log(datetime );
+         const created= new Date(datetime).getTime();
+         const updated = Date.now();
+
+        //  console.log(created );
+        //  console.log(updated);
+         float_time= 1800 - ((updated)-(created))/1000 ;
+         var timeleft = Math.round( float_time );
+        //  console.log(timeleft);
+         
+         console.log("minutes:" , Math.floor(timeleft/60));
+         console.log("seconds:" , timeleft%60);
+
+     return res.status(200).json({
+            nextquestion:question_data,
+            timedata:timeleft
+         });
+
+
+
   } catch (error) {
     console.error("Error in next function:", error);
     res.status(500).json({ message: "Internal server error" });

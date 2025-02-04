@@ -1,34 +1,65 @@
 import { ProgressModel, UserModel } from "../config/db.js";
 import { QuestionModel } from "../config/db.js";
+import { Sequelize } from 'sequelize';
 
 const start = async (req, res) => {
   try {
-    const userId = req.user.userId;
-    console.log(userId);
+    const user = req.user;
 
-    // Finding User's Progress Table
-    const progress = await ProgressModel.findOne({
-      where: { userid: userId },
-    });
-
-    if (!progress) {
-      return res.status(404).json({ message: "Progress not found!" });
+    let questions;
+    try {
+      questions = await QuestionModel.findAll({
+        attributes: ['id', 'correct'],
+        where: { isJunior: user.isJunior },
+        order: [
+          Sequelize.fn('RANDOM')
+        ]
+      });
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+      return res.status(500).json({ message: 'Internal server error' });
     }
 
-    const questionId = progress.Questionsid[progress.Counter]; // Questions ID
+    // Array of Question Ids and Correct Options idx 
+    const questionIds = questions.map((question) => question.id);
+    const correctOptions = questions.map((question) => question.correct);
 
-    const questionData = await QuestionModel.findOne({
-      where: { id: questionId },
-    });
+    try {
+      // Progress Table Created :)
+      const currentProgress = await ProgressModel.create({
+        userid: user.userId,
+        Questionsid: questionIds,
+        Correctans: correctOptions,
+        isJunior: user.isJunior,
+        Marks: 0,
+        Counter: 0,
+        Selectedans: [],
+      });
 
-    if (!questionData) {
-      return res.status(404).json({ message: "Question not found!" });
+      if (!currentProgress) {
+        return res.status(404).json({ message: "Progress not found!" });
+      }
+
+      const questionId = currentProgress.Questionsid[currentProgress.Counter]; // Questions ID
+
+      const questionData = await QuestionModel.findOne({
+        where: { id: questionId },
+      });
+
+      if (!questionData) {
+        return res.status(404).json({ message: "Question not found!" });
+      }
+      const { question, options } = questionData;
+
+      const timeleft = 1800//30min start time 
+      return res.status(200).json({ question, options , timeleft });
+
+
+    } catch (error) {
+      console.error('Error creating progress record:', error);
+      return res.status(500).json({ message: 'Internal server error' });
     }
 
-    const { question, options } = questionData;
-
-    // await progress.increment('Counter',{by:1})
-    res.status(200).json({ question, options });
   } catch (error) {
     console.error("Error in start function:", error);
     res.status(500).json({ message: "Internal server error" });

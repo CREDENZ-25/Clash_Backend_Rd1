@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 dotenv.config()
 
 const authMiddleware = (req, res, next) => {
-    console.log("hello");
     console.log(req.cookies);
     const token = req.cookies.token;  // Get token from cookies
     console.log("Hello AuthMiddleware")
