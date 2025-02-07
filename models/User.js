@@ -6,12 +6,16 @@ export const User = (sequelize) => {
       autoIncrement: true,
       primaryKey: true,
     },
+    username:{
+      type:DataTypes.STRING,
+      allowNull: false,
+    },
     email: {
       type: DataTypes.STRING,  
       allowNull: false,
       unique: true,  
       validate: {
-        isEmail: true,  
+        isEmail: true, 
       },
     },
     password: {
@@ -22,10 +26,7 @@ export const User = (sequelize) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-  }, {
-    tableName: 'users', 
-    timestamps: true,  
-  },
+  }
   );
 };
 export default User

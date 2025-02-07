@@ -1,4 +1,5 @@
 import { DataTypes } from "sequelize";
+import { UserModel } from "../config/db.js";
 const Progress = (sequelize) => {
   const ProgressModel = sequelize.define("Progress", {
     Questionsid: {
@@ -19,8 +20,10 @@ const Progress = (sequelize) => {
     isJunior: {
       type: DataTypes.BOOLEAN,
     },
-    userid: { 
+    userid: {  
       type: DataTypes.INTEGER,
+      allownull:false,
+      references:{model :UserModel,key:'userid'}
     }
   });
   return ProgressModel;

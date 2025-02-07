@@ -5,15 +5,12 @@ import { Sequelize } from 'sequelize';
 const start = async (req, res) => {
   try {
     const user = req.user;
-
     let questions;
     try {
       questions = await QuestionModel.findAll({
         attributes: ['id', 'correct'],
         where: { isJunior: user.isJunior },
-        order: [
-          Sequelize.fn('RANDOM')
-        ]
+        order: Sequelize.literal('RANDOM()')
       });
     } catch (error) {
       console.error('Error fetching questions:', error);
