@@ -2,6 +2,11 @@ import { QuestionModel } from "../config/db.js";
 import { ProgressModel } from "../config/db.js";
 
 const next = async (req, res) => {
+
+  if(req.user==null){
+    return  res.status(404).json({error:"User not found"});
+  }
+
   // console.log("NEXT!!!");
   const answer = req.body.answer;  
   if(answer==null){

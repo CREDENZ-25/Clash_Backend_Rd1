@@ -4,6 +4,9 @@ import { Sequelize } from 'sequelize';
 
 const start = async (req, res) => {
   try {
+    if(req.user==null){
+      return  res.status(404).json({error:"User not found"});
+    }
     const user = req.user;
     let questions;
     try {
@@ -20,7 +23,6 @@ const start = async (req, res) => {
     // Array of Question Ids and Correct Options idx 
     const questionIds = questions.map((question) => question.id);
     const correctOptions = questions.map((question) => question.correct);
-
     try {
       // Progress Table Created :)
       const currentProgress = await ProgressModel.create({

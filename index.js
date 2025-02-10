@@ -17,12 +17,10 @@ app.use(cookieParser());
 app.use(express.json({strict:false}));
 app.use(express.urlencoded({ extended: true }));
 
-
+app.use('/login', loginRoutes);
 app.use('/start',authMiddleware,startController);
 app.use('/next',authMiddleware,qscontroller);
-app.use('/login', loginRoutes);
-app.use('/leaderboard', leaderBoardRoute);
-
+app.use('/leaderboard',authMiddleware,leaderBoardRoute);
 
 
 app.get('/', (req, res) => {
