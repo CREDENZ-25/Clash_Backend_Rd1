@@ -1,61 +1,43 @@
-import express from "express";
-import dotenv from "dotenv";
-import { Sequelize, DataTypes, Model  } from "sequelize";
-import {MCQ, initMCQModel} from './models/mcq.js';
-import {User, initUserModel} from './models/User.js';
-import {Progress, initProgressModel} from './models/progress.js';
-import cors from 'cors';
-import {login} from './controllers/logincontroller.js';
-import {start} from './controllers/startcontroller.js';
-import {nextbutton} from './controllers/qscontroller.js';
-import cookieParser from 'cookie-parser';
-import jwt from 'jsonwebtoken';
+import express from 'express';
+import dotenv from 'dotenv';
+import { syncDatabase} from './config/db.js'; 
+import loginRoutes from './routes/loginRoute.js'; 
+import startController from './controllers/startcontroller.js'
+import leaderBoardRoute from './routes/leaderBoardRoute.js'
+import authMiddleware from './middlewares/authMiddleware.js';
+import qscontroller from './controllers/qscontroller.js'
 dotenv.config();
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
-
-const{DB_HOST,DB_USER,DB_DB, DB_PASS } = process.env;
-    const sequelize = new Sequelize(DB_DB, DB_USER, DB_PASS,{
-        host: DB_HOST,
-        dialect: 'postgres',
-       
-    });
-
-    sequelize
-    .authenticate()
-    .then(async ()=> {console.log('Connected');
-      await initUserModel(sequelize);
-     await initProgressModel(sequelize); // Call the function to initialize the model
-     await initMCQModel(sequelize);
-     
-}) .catch(console.error);
-     sequelize
-    .sync({ alter: true }) // `alter: true` updates tables without dropping data
-    .then(() => console.log("Database synced successfully"))
-   
-    const app = express();
+const app = express();
 
 // Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors());
 app.use(cookieParser());
-   
+app.use(cors({
+  origin:'http://localhost:5173',
+  methods: "GET,POST,PUT,DELETE",
+  credentials:true,
+}));
+
+app.use(express.json({strict:false}));
+app.use(express.urlencoded({ extended: true }));
+
+
+app.use('/start',authMiddleware,startController);
+app.use('/next',authMiddleware,qscontroller);
+app.use('/login', loginRoutes);
+app.use('/leaderboard', leaderBoardRoute);
 
 
 
-//login request
-
-
-
-    login();
-    start();
-    nextbutton();
-    
+app.get('/', (req, res) => {
+  res.send('Server is up and running!');
+});
+const PORT = process.env.PORT || 5000;
 
 // Start the server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
+  await syncDatabase();
 });
-
-export {app};
