@@ -16,7 +16,7 @@ const next = async (req, res) => {
     let userData;
     try {
       userData = await ProgressModel.findOne({
-        attributes: ["Counter", "Questionsid", "Selectedans", "Correctans", "Marks","createdAt"],
+        attributes: ["Counter", "Questionsid", "Selectedans", "Correctans", "Marks","createdAt","Corrects"],
         where: {
           userid: userId,
         },
@@ -42,8 +42,9 @@ const next = async (req, res) => {
 
     try {
       if (String(check) === String(answer)) {
+
         await ProgressModel.update(
-          { Marks: Marks + 4, Selectedans: [...selected_array, answer], Counter: counter + 1 },
+          { Marks: Marks + 4, Selectedans: [...selected_array, answer], Counter: counter + 1,Corrects: userData.Corrects+1 },
           { where: { userid: userId } }
         );
       } else {
@@ -58,6 +59,7 @@ const next = async (req, res) => {
     }
 
     let question_data;
+    if (counter===3){return res.status(202).json('Questions over');}
     try {
       const qid = userData.Questionsid[counter + 1];
       question_data = await QuestionModel.findOne({
@@ -87,7 +89,7 @@ const next = async (req, res) => {
          float_time= 1800 - ((updated)-(created))/1000 ;
          var timeleft = Math.round( float_time );
         //  console.log(timeleft);
-         
+        if (timeleft<=0){return res.status(202).json('Time over');}    
          console.log("minutes:" , Math.floor(timeleft/60));
          console.log("seconds:" , timeleft%60);
 

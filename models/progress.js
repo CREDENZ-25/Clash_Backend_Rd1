@@ -11,6 +11,9 @@ const Progress = (sequelize) => {
     Correctans: {
       type: DataTypes.ARRAY(DataTypes.INTEGER),
     },
+    Corrects: {
+      type: DataTypes.INTEGER,
+    },
     Marks: {
       type: DataTypes.INTEGER,
     },

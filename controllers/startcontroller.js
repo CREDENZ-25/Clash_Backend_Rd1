@@ -31,6 +31,7 @@ const start = async (req, res) => {
         Marks: 0,
         Counter: 0,
         Selectedans: [],
+        Corrects:0,
       });
 
       if (!currentProgress) {

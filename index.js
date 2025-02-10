@@ -5,7 +5,8 @@ import loginRoutes from './routes/loginRoute.js';
 import startController from './controllers/startcontroller.js'
 import leaderBoardRoute from './routes/leaderBoardRoute.js'
 import authMiddleware from './middlewares/authMiddleware.js';
-import qscontroller from './controllers/qscontroller.js'
+import qscontroller from './controllers/qscontroller.js';
+import submit from './controllers/submitController.js';
 dotenv.config();
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -28,6 +29,7 @@ app.use('/start',authMiddleware,startController);
 app.use('/next',authMiddleware,qscontroller);
 app.use('/login', loginRoutes);
 app.use('/leaderboard', leaderBoardRoute);
+app.use('/submit',authMiddleware,submit);
 
 
 
