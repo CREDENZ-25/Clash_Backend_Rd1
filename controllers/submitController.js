@@ -17,7 +17,7 @@ const submit = async (req, res) => {
     })
 
     return res.status(200).json({
-        "Attempted":submitData.Counter+1,
+        "Attempted":submitData.Counter,
         "Correct Questions": submitData.Corrects,
         "Score": submitData.Marks,
     });
