@@ -1,11 +1,9 @@
-import { Router } from 'express';
 import { ProgressModel } from '../config/db.js';  
 import { UserModel } from '../config/db.js'; 
 import dotenv from 'dotenv';
 dotenv.config();
-const router = Router();
 
-router.post('/', async (req, res) => {
+const leaderboard = async (req, res) => {
     try {
         const { userId, isJunior } = req.user || {}; 
 
@@ -64,11 +62,13 @@ router.post('/', async (req, res) => {
         return res.status(200).json({
             juniorLeaderboard,
             seniorLeaderboard,
-            userRank: userId ? userRank : null 
+            userRank: userId ? userRank : null,
+            isJunior: isJunior ? isJunior : null
         });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Internal server error' });
     }
-});
-export default router;
+}
+
+export default leaderboard;

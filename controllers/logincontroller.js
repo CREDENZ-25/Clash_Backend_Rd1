@@ -1,11 +1,9 @@
-import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { UserModel} from '../config/db.js';
 dotenv.config();
-const router = Router();
 
-router.post('/', async (req, res) => {
+const login = async (req, res) => {
     const { email, password } = req.body;
     try {
         const user = await UserModel.findOne({
@@ -35,7 +33,7 @@ router.post('/', async (req, res) => {
             return res.status(500).json({ message: 'Internal server error' });
         }
         
-        console.log("token =", token);
+        // console.log("token =", token);
         
         try {
             res.cookie('token', token, {
@@ -53,6 +51,6 @@ router.post('/', async (req, res) => {
         console.error('Error during login:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
-});
+}
 
-export default router;
+export default login;

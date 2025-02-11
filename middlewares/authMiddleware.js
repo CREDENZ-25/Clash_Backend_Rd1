@@ -5,7 +5,7 @@ dotenv.config()
 const authMiddleware = (req, res, next) => {
     // console.log(req.cookies);
     const token = req.cookies.token;  
-    console.log("Hello AuthMiddleware")
+    // console.log("Hello AuthMiddleware")
     if (!token) {
         req.user = null;
         return next();

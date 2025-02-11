@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 export const question = (sequelize) => {
   return sequelize.define('questions', {
+  
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
