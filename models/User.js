@@ -1,33 +1,35 @@
-import { Model, ENUM, STRING, TEXT, INTEGER} from "sequelize";
-
-class Clash extends Model{}
-
-const initClashModel = sequelize => {
-    Clash.init(
-        {
-            id:{
-                type: INTEGER,
-                primaryKey: true,
-                autoIncrement: true,
-
-            },
-        email:{
-            type: STRING({length:256}),
-            allowNull: false,
-            unique: true,
-            
-        },
-        password: {
-            type: STRING({length: 256}),
-            allowNull: false,
-            
-        }
-        }
-   ,{sequelize} );
-
-
-return Clash.sync().then(()=> console.log('Created User Table'))
-.catch(console.error);
+import { DataTypes } from 'sequelize';
+export const User = (sequelize) => {
+    return sequelize.define('User', {
+    userid: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    username:{
+      type:DataTypes.STRING,
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,  
+      allowNull: false,
+      unique: true,  
+      validate: {
+        isEmail: true, 
+      },
+    },
+    password: {
+      type: DataTypes.STRING,  
+      allowNull: false,
+    },
+    isJunior: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    
+  },
+  {timestamps:false}
+  
+  );
 };
-
-export { Clash, initClashModel };
+export default User
