@@ -20,6 +20,7 @@ const submit = async (req, res) => {
         "Attempted":submitData.Counter,
         "Correct Questions": submitData.Corrects,
         "Score": submitData.Marks,
+        "Accuracy": Math.round((submitData.Corrects/submitData.Counter))*100+"%",
     });
   
 };
