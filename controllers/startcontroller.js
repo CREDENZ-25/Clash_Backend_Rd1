@@ -47,10 +47,10 @@ const start = async (req, res) => {
       if (!questionData) {
         return res.status(404).json({ message: "Question not found!" });
       }
-      const { question, options } = questionData;
+      const { questions, options } = questionData;
 
       const timeleft = 1800//30min start time 
-      return res.status(200).json({ question, options , timeleft });
+      return res.status(200).json({ questions, options , timeleft });
 
 
     } catch (error) {
