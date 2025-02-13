@@ -7,11 +7,12 @@ const login=require("../controllers/userController.js");
 const GetMoreOrLoseMore=require("../controllers/LifeLineController.js");
 const use5050Lifeline=require("../controllers/LifeLineController.js/");
 
-
+//login 
 router.post('/login', login);
 
 //start the quiz
-router.post("/start-quiz",authMiddleware,startQuizHandler);
+router.post("/start-quiz", authMiddleware, startQuizHandler);
+
 
 //next-button to submit the current mcqs answer and go to the next
 router.post('/next', authMiddleware, nextButtonHandler);
@@ -22,13 +23,12 @@ router.get("/leaderboard",);
 //to view user result
 router.get("/result",);
 
-router.post("/submit",);
+router.post("/submit",authMiddleware,nextButtonHandler);
 
-router.post("/",authMiddleware,);
+router.post("/lifelines/5050", authMiddleware, use5050Lifeline);
 
-router.post("/lifeline2",authMiddleware,use5050Lifeline);
+router.post("/lifelines/gamble", authMiddleware, GetMoreOrLoseMore);
 
-router.post("/lifeline3",authMiddleware,GetMoreOrLoseMore);
 
 
 

@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes, Op } = require("sequelize");
 const { Question } = require("../models/Question");
-const { Progress } = require("../models/Progress");
+const { Progress } = require("../models/progress");
 
 // Initialize Sequelize connection
 const sequelize = new Sequelize("your_database", "your_username", "your_password", {
