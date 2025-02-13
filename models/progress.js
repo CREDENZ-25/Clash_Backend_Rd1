@@ -23,6 +23,9 @@ const Progress = (sequelize) => {
     isJunior: {
       type: DataTypes.BOOLEAN,
     },
+    Lifeline: {
+      type: DataTypes.ARRAY(DataTypes.INTEGER),
+    },
     userid: {  
       type: DataTypes.INTEGER,
       allownull:false,
