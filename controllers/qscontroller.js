@@ -56,6 +56,20 @@ const next = async (req, res) => {
           { where: { userid: userId } }
         );
       }
+      if(lifeline[counter]==2){
+        if(String(check) === String(answer)){
+          await ProgressModel.update(
+            { Marks: Marks + 4 },
+            { where: { userid: userId } }
+          )
+        }
+        else{
+          await ProgressModel.update(
+            { Marks: Marks - 3 },
+            { where: { userid: userId } }
+          )
+        }
+      }
     }
       else{
           if (String(check) === String(answer)) {

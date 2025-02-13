@@ -1,56 +1,78 @@
 const { Sequelize, DataTypes, Op } = require("sequelize");
-import { QuestionModel } from "../config/db.js";
+import { MCQs } from "../config/db.js";
 import { ProgressModel } from "../config/db.js";
 
 const lifeline = async (req, res) => {
+          //req.user.userid - is it expected to come from authmiddleware?
             const userid=req.user.userid;
 
-            if (!userId) {
+            if (!userid) {
                 return res.status(400).json({ message: "User ID not found!" });
               }
 
             const number=req.body;
             
+            
             ldata= await ProgressModel.findOne({
-                attributes:["Counter","Lifeline","Correctans"],
+                attributes:["Counter","Lifeline","Correctans","Questionsid"],
                 where: {
-                    userid: userId
+                    userid: userid
                 }
                 })
             
            ldata.Lifeline[ldata.Counter]=number;
 
            if(number==1){
-            const transaction = await sequelize.transaction();
+           
+            
+            const qid=ldata.Questionsid[ldata.Counter];
 
             try {
-              const question = await MCQs.findOne(questionId, { transaction });
+              const question = await MCQs.findOne({
+                attributes:["options"],
+                where: {
+                    id:qid
+                }
+                })
+            ;
               if (!question) throw new Error("Question not found");
           
-              const { optionArray, answerIdx } = question;
+              const  optionArray = question.options;
+              const answerIdx = ldata.Correctans[ldata.Counter];
               const incorrectIndices = optionArray.map((_, index) => index).filter((index) => index !== answerIdx);
               const shuffledIncorrectIndices = incorrectIndices.sort(() => 0.5 - Math.random());
-              const selectedIncorrectIndices = shuffledIncorrectIndices.slice(0, 2);
-              const reducedOptions = [optionArray[answerIdx], optionArray[selectedIncorrectIndices[0]]];
-          
-              const progress = await Progress.findByPk(progressId, { transaction });
+             console.log(shuffledIncorrectIndices);
+
+            }
+            catch(error){
+              console.error("Error ahe ata in shuffling", error.message);
+            }}
+          try{
+              const progress = await ProgressModel.findOne({
+                attributes:["Lifeline"],
+                where: {
+                    userid:userid
+                }
+                }
+
+              );
               if (!progress) throw new Error("Progress record not found");
           
-              const isusedlifeline = [...progress.isusedlifeline];
-              isusedlifeline[0] = true;
+              const isusedlifeline = [...progress.Lifeline,number];
+              
           
-              await progress.update({ isusedlifeline }, { transaction });
-              await transaction.commit();
+              await ProgressModel.update({ Lifeline:isusedlifeline });
+             
           
-              return reducedOptions;
+              return res.status(200);
             } catch (error) {
               console.error("Error using 50-50 lifeline:", error.message);
-              await transaction.rollback();
+             
               throw error;
             }
 
 
-           }
+           
 /*
 
 // Initialize Sequelize connection
