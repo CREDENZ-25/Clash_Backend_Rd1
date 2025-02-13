@@ -30,6 +30,8 @@ app.use('/next',authMiddleware,qscontroller);
 app.use('/login', loginRoutes);
 app.use('/leaderboard', leaderBoardRoute);
 app.use('/submit',authMiddleware,submit);
+app.use('/lifeline',authMiddleware,lifeline);
+
 
 
 

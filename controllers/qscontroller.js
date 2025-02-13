@@ -16,7 +16,7 @@ const next = async (req, res) => {
     let userData;
     try {
       userData = await ProgressModel.findOne({
-        attributes: ["Counter", "Questionsid", "Selectedans", "Correctans", "Marks","createdAt","Corrects"],
+        attributes: ["Counter", "Questionsid", "Selectedans", "Correctans", "Marks","createdAt","Corrects","Lifeline"],
         where: {
           userid: userId,
         },
@@ -35,16 +35,50 @@ const next = async (req, res) => {
     const question_array = userData.Questionsid;
     const counter = userData.Counter;
     const Marks = userData.Marks;
+    const lifeline=userData.Lifeline;
 
     // console.log(correct_array, selected_array, question_array, counter);
     const check = correct_array[counter];
     // console.log(check);
 
     try {
+      
+    if(lifeline[counter]==1 || lifeline[counter]==2|| lifeline[counter]==3){
+          if (String(check) === String(answer)) {
+
+              await ProgressModel.update(
+              { Marks: Marks + 4, Selectedans: [...selected_array, answer], Counter: counter + 1,Corrects: userData.Corrects+1 },
+               { where: { userid: userId } }
+        );
+      } else {
+        await ProgressModel.update(
+          { Marks: Marks - 1, Selectedans: [...selected_array, answer], Counter: counter + 1 },
+          { where: { userid: userId } }
+        );
+      }
+    }
+      else{
+          if (String(check) === String(answer)) {
+
+              await ProgressModel.update(
+              { Marks: Marks + 4, Selectedans: [...selected_array, answer], Lifelines:[...lifeline, 0],Counter: counter + 1,Corrects: userData.Corrects+1 },
+               { where: { userid: userId } }
+        );
+      } else {
+        await ProgressModel.update(
+          { Marks: Marks - 1, Selectedans: [...selected_array, answer],Lifelines:[...lifeline, 0] ,Counter: counter + 1 },
+          { where: { userid: userId } }
+        );
+      }
+      
+      
+      }
+
+      
       if (String(check) === String(answer)) {
 
         await ProgressModel.update(
-          { Marks: Marks + 4, Selectedans: [...selected_array, answer], Counter: counter + 1,Corrects: userData.Corrects+1 },
+          { Marks: Marks + 4, Selectedans: [...selected_array, answer], Lifelines:[...lifeline, 0],Counter: counter + 1,Corrects: userData.Corrects+1 },
           { where: { userid: userId } }
         );
       } else {
