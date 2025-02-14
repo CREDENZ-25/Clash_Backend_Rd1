@@ -1,19 +1,25 @@
-const jwt = require('jsonwebtoken');
-
-require('dotenv').config(); 
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config()
 
 const authMiddleware = (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1]; 
+    // console.log(req.cookies);
+    const token = req.cookies.token;  
+    // console.log("Hello AuthMiddleware")
     if (!token) {
-        return res.status(401).json({ message: 'token is missing' });
+        req.user = null;
+        return next();
     }
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET); 
-        req.user = decoded; 
-        next(); 
+        console.log(decoded);
+        req.user = decoded;
+        return next(); 
     } catch (error) {
-        return res.status(401).json({ message: 'Invalid token.' });
+        req.user = null;
     }
+    next();
 };
 
-module.exports = authMiddleware;
+export default authMiddleware;
+
