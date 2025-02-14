@@ -27,7 +27,13 @@ const initProgressModel = sequelize => {
         },
         isJunior:{
             type:BOOLEAN
-        }
+        },
+        isUsedLifelines: {
+            type: DataTypes.ARRAY(DataTypes.INTEGER),  // Store question IDs (default: [-1, -1, -1])
+            allowNull: false,
+            defaultValue: [-1, -1, -1]
+}
+
         }
    ,{sequelize} );
    Progress.belongsTo(User, {

@@ -6,6 +6,7 @@ const nextButtonHandler=require("../controllers/qsController.js");
 const login=require("../controllers/userController.js");
 const GetMoreOrLoseMore=require("../controllers/LifeLineController.js");
 const use5050Lifeline=require("../controllers/LifeLineController.js/");
+const useDoubleDipLifeline=require("../controllers/LifeLineController.js")
 
 //login 
 router.post('/login', login);
@@ -28,6 +29,8 @@ router.post("/submit",authMiddleware,nextButtonHandler);
 router.post("/lifelines/5050", authMiddleware, use5050Lifeline);
 
 router.post("/lifelines/gamble", authMiddleware, GetMoreOrLoseMore);
+
+router.post("/lifelines/double-dip",authMiddleware,useDoubleDipLifeline);
 
 
 
