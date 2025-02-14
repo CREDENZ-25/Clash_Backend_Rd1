@@ -1,25 +1,13 @@
 const { Sequelize } = require("sequelize");
 const { Question } = require("../models/Question");
-const { Progress } = require("../models/Progress");
+const { Progress } = require("../models/progress");
 
-// Initialize Sequelize connection
-const sequelize = new Sequelize("your_database", "your_username", "your_password", {
-  host: "localhost",
-  dialect: "postgres",
-});
-
-/**
- * Helper function to get the current question ID for a user.
- */
 async function getCurrentQuestionId(userId, transaction) {
   const progress = await Progress.findOne({ where: { userId }, transaction });
   if (!progress) throw new Error("Progress record not found");
   return progress.questionIds[progress.counter]; // Get current question ID
 }
 
-/**
- * Helper function to fetch the current question for a user.
- */
 async function getCurrentQuestion(userId, transaction) {
   const questionId = await getCurrentQuestionId(userId, transaction);
   const question = await Question.findByPk(questionId, { transaction });
@@ -27,11 +15,8 @@ async function getCurrentQuestion(userId, transaction) {
   return question;
 }
 
-/**
- * 50-50 Lifeline: Removes two incorrect options.
- */
 async function use5050Lifeline(req) {
-  const transaction = await sequelize.transaction();
+  // const transaction = await sequelize.transaction();
   const userId = req.user.id;
 
   try {
@@ -49,7 +34,7 @@ async function use5050Lifeline(req) {
       .sort(() => 0.5 - Math.random())
       .slice(0, 2);
 
-    const reducedOptions = [optionArray[answerIdx], optionArray[incorrectIndices[0]]];
+    const reducedOptions = [option[answerIdx], optionArray[incorrectIndices[0]]];
 
     // Mark lifeline as used on this question
     progress.isusedlifeline[0] = question.id;
@@ -92,7 +77,7 @@ async function useGetMoreOrLoseMore(req, userAnswerIndex) {
   } catch (error) {
     console.error("Error using GetMoreOrLoseMore lifeline:", error.message);
     await transaction.rollback();
-    throw error;
+    return res.status(500).json({ error: error.message });
   }
 }
 
@@ -136,5 +121,58 @@ async function useDoubleDipLifeline(req, firstGuessIndex, secondGuessIndex = nul
     throw error;
   }
 }
+const set5050Lifeline =async (req, res) => 
+{
+  const userId = req.user.id;
 
-module.exports = { use5050Lifeline, useGetMoreOrLoseMore, useDoubleDipLifeline };
+  try {
+    const progress = await Progress.findOne({ where: { userId }});
+    if (progress.isUsed5050 ==null)
+      return res.status(400).json({ error: `50-50 lifeline already used`});
+  progress.isUsed5050=true;
+  await progress.update({ isUsed5050:progress.isUsed5050 });
+
+  }
+  catch(error){
+      console.error("Error using 50-50 lifeline:", error.message);
+      throw error;
+  }
+
+}
+const setGambleLifeline =async (req, res) => 
+  {
+    const userId = req.user.id;
+  
+    try {
+      const progress = await Progress.findOne({ where: { userId }});
+      if (progress.isUsedGamble ==null)
+        return res.status(400).json({ error: `Gamble lifeline already used`});
+    progress.isUsedGamble=true;
+    await progress.update({ isUsedGamble:progress.isUsedGamble });
+  
+    }
+    catch(error){
+        console.error("Error using 50-50 lifeline:", error.message);
+        throw error;
+    }
+  
+  }
+  const setDoubleDipLifeline =async (req, res) => 
+    {
+      const userId = req.user.id;
+    
+      try {
+        const progress = await Progress.findOne({ where: { userId }});
+        if (progress.isUsedDoubleDip ==null)
+          return res.status(400).json({ error: `Double Dip lifeline already used`});
+      progress.isUsedDoubleDip=true;
+      await progress.update({ isUsedDoubleDip:progress.isUsedDoubleDip });
+    
+      }
+      catch(error){
+          console.error("Error using 50-50 lifeline:", error.message);
+          throw error;
+      }
+    
+    }
+module.exports = { setDoubleDipLifeline,setGambleLifeline,set5050Lifeline };

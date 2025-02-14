@@ -1,7 +1,5 @@
 import MCQ from '../models/mcq';
 import Progress from '../models/progress';
-import User from '../models/User';
-import express from "express";
 import cookieParser from 'cookie-parser';
 
 app.use(cookieParser());

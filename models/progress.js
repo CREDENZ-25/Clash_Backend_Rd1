@@ -28,12 +28,25 @@ const initProgressModel = sequelize => {
         isJunior:{
             type:BOOLEAN
         },
-        isUsedLifelines: {
-            type: DataTypes.ARRAY(DataTypes.INTEGER),  // Store question IDs (default: [-1, -1, -1])
-            allowNull: false,
-            defaultValue: [-1, -1, -1]
-}
-
+        isUsed5050:
+        {
+            type: DataTypes.BOOLEAN,
+            allowNull: true,
+            defaultValue: null,  
+        },
+        isUsedGamble:
+        {
+            type: DataTypes.BOOLEAN,
+            allowNull: true,
+            defaultValue: null,  
+        },
+        isUsedDoubleDip:
+        {
+            type: DataTypes.BOOLEAN,
+            allowNull: true,
+            defaultValue: null,      
+        }
+        
         }
    ,{sequelize} );
    Progress.belongsTo(User, {
