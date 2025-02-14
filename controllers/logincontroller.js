@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { UserModel} from '../config/db.js';
+import bcrypt from "bcrypt";
 dotenv.config();
 
 const login = async (req, res) => {
@@ -14,9 +15,12 @@ const login = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found!' });
         }
+        // console.log(password)
+        // const hashpassword = await bcrypt.hash(password,10)
+        // console.log(hashpassword)
 
-        // Password Hashed??
-        const isPasswordValid = password === user.password;
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        // console.log(user.password)
 
         if (!isPasswordValid) {
             return res.status(400).json({ message: 'Password is incorrect!' });
@@ -38,7 +42,7 @@ const login = async (req, res) => {
         try {
             res.cookie('token', token, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
+                // secure: process.env.NODE_ENV === 'production',
                 maxAge: 3600000,
             });
             res.status(200).json({message:"Login successful"});
