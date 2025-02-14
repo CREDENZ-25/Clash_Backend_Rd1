@@ -7,6 +7,7 @@ import leaderBoardRoute from './routes/leaderBoardRoute.js'
 import authMiddleware from './middlewares/authMiddleware.js';
 import qscontroller from './controllers/qscontroller.js';
 import submit from './controllers/submitController.js';
+import lifeline from './controllers/lifelineController.js';
 dotenv.config();
 import cookieParser from 'cookie-parser';
 import cors from 'cors';

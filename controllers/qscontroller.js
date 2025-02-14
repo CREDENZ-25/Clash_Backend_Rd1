@@ -16,7 +16,7 @@ const next = async (req, res) => {
     let userData;
     try {
       userData = await ProgressModel.findOne({
-        attributes: ["Counter", "Questionsid", "Selectedans", "Correctans", "Marks","createdAt","Corrects","Lifeline"],
+        attributes: ["Counter", "Questionsid", "Selectedans", "Correctans", "Marks","createdAt","Corrects"],
         where: {
           userid: userId,
         },
@@ -34,8 +34,10 @@ const next = async (req, res) => {
     const selected_array = userData.Selectedans;
     const question_array = userData.Questionsid;
     const counter = userData.Counter;
-    const Marks = userData.Marks;
-    const lifeline=userData.Lifeline;
+    let Marks = userData.Marks;
+   
+    
+  
 
     // console.log(correct_array, selected_array, question_array, counter);
     const check = correct_array[counter];
@@ -43,81 +45,48 @@ const next = async (req, res) => {
 
     try {
       
-    if(lifeline[counter]==1 || lifeline[counter]==2|| lifeline[counter]==3){
-          if (String(check) === String(answer)) {
+   
+        if (String(check) === String(answer)) {
 
               await ProgressModel.update(
               { Marks: Marks + 4, Selectedans: [...selected_array, answer], Counter: counter + 1,Corrects: userData.Corrects+1 },
-               { where: { userid: userId } }
+               { where: { userid: userId } },
+
+               Marks=Marks+4
         );
       } else {
         await ProgressModel.update(
           { Marks: Marks - 1, Selectedans: [...selected_array, answer], Counter: counter + 1 },
-          { where: { userid: userId } }
-        );
-      }
-      if(lifeline[counter]==2){
-        if(String(check) === String(answer)){
-          await ProgressModel.update(
-            { Marks: Marks + 4 },
-            { where: { userid: userId } }
-          )
-        }
-        else{
-          await ProgressModel.update(
-            { Marks: Marks - 3 },
-            { where: { userid: userId } }
-          )
-        }
-      }
-    }
-      else{
-          if (String(check) === String(answer)) {
+          { where: { userid: userId } },
 
-              await ProgressModel.update(
-              { Marks: Marks + 4, Selectedans: [...selected_array, answer], Lifelines:[...lifeline, 0],Counter: counter + 1,Corrects: userData.Corrects+1 },
-               { where: { userid: userId } }
-        );
-      } else {
-        await ProgressModel.update(
-          { Marks: Marks - 1, Selectedans: [...selected_array, answer],Lifelines:[...lifeline, 0] ,Counter: counter + 1 },
-          { where: { userid: userId } }
+          Marks=Marks-1
         );
       }
       
-      
-      }
-
-      
-      if (String(check) === String(answer)) {
-
-        await ProgressModel.update(
-          { Marks: Marks + 4, Selectedans: [...selected_array, answer], Lifelines:[...lifeline, 0],Counter: counter + 1,Corrects: userData.Corrects+1 },
-          { where: { userid: userId } }
-        );
-      } else {
-        await ProgressModel.update(
-          { Marks: Marks - 1, Selectedans: [...selected_array, answer], Counter: counter + 1 },
-          { where: { userid: userId } }
-        );
-      }
     } catch (error) {
       console.error("Unable to update progress:", error);
       return res.status(500).json({ message: "Error updating progress" });
     }
 
     let question_data;
+    let marksData;
     if (counter===3){return res.status(202).json('Questions over');}
+    let optionsObject=null;
     try {
       const qid = userData.Questionsid[counter + 1];
       question_data = await QuestionModel.findOne({
-        attributes: ["questions", "options"],
+        attributes: ["questions", "options"],  //0 :new york
         where: { id: qid },
       });
 
-      if (!question_data) {
-        return res.status(404).json({ message: "Question not found" });
-      }
+      optionsObject = {
+        "0": question_data.options[0], 
+        "1": question_data.options[1],
+        "2": question_data.options[2],
+        "3": question_data.options[3],
+    };
+    
+      
     } catch (error) {
       console.error("Error fetching next question:", error);
       return res.status(500).json({ message: "Error fetching next question" });
@@ -141,9 +110,12 @@ const next = async (req, res) => {
          console.log("minutes:" , Math.floor(timeleft/60));
          console.log("seconds:" , timeleft%60);
 
+         
      return res.status(200).json({
-            nextquestion:question_data,
-            timedata:timeleft
+            nextquestion:question_data.questions,
+            optionsIndex:optionsObject,
+            timedata:timeleft,
+            marks: Marks,
          });
 
 
