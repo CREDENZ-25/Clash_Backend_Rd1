@@ -2,7 +2,6 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { syncDatabase} from './config/db.js'; 
 import userRoutes from './routes/userRoutes.js'
-
 // import loginRoutes from './routes/loginRoute.js'; 
 // import startController from './controllers/startcontroller.js'
 // import leaderBoardRoute from './routes/leaderBoardRoute.js'
@@ -14,12 +13,20 @@ import cookieParser from 'cookie-parser';
 
 const app = express();
 
+// Test the database connection
+sequelize
+  .authenticate() 
+  .then(() => console.log('Database connected successfully!'))
+  .catch((err) => console.error('Error connecting to the database:', err));
+
+
 // Middleware
 app.use(cookieParser());
 app.use(express.json({strict:false}));
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/',userRoutes);
+
 
 // app.use('/login', loginRoutes);
 // app.use('/start',authMiddleware,startController);

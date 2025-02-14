@@ -33,3 +33,4 @@ export const User = (sequelize) => {
   );
 };
 export default User
+

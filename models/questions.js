@@ -33,3 +33,4 @@ export const question = (sequelize) => {
   });
 };
 export default question
+
