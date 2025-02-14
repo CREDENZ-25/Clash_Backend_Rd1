@@ -26,6 +26,9 @@ export const User = (sequelize) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+  },
+  {
+    timestamps: false,  
   }
   );
 };
