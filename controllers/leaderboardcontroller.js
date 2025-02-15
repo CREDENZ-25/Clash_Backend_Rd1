@@ -7,6 +7,7 @@ const calculateRank = async(userId, isJunior) => {
     let juniorLeaderboard = [];
     let seniorLeaderboard = [];
 
+
     const leaderboardData = await ProgressModel.findAll({
         attributes: ['userid', 'Marks', 'isJunior','Counter'],
         order: [['Marks', 'DESC']],
@@ -77,5 +78,7 @@ const leaderboard = async (req, res) => {
         return res.status(500).json({ message: 'Internal server error' });
     }
 };
+
 export { leaderboard , calculateRank };
+
 
