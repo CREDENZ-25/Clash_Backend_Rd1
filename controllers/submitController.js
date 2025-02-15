@@ -15,12 +15,14 @@ const submit = async (req, res) => {
         userid: userId
     }
     })
+    
 
     return res.status(200).json({
         "Attempted":submitData.Counter,
         "Correct Questions": submitData.Corrects,
         "Score": submitData.Marks,
         "Accuracy": Math.round((submitData.Corrects/submitData.Counter))*100+"%",
+
     });
   
 };
