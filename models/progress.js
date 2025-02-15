@@ -24,6 +24,10 @@ const Progress = (sequelize) => {
       type: DataTypes.INTEGER,
       allownull:false,
       references:{model :UserModel,key:'userid'}
+    },
+    Corrects:{
+      type: DataTypes.INTEGER,
+      allownull:false,
     }
   });
   return ProgressModel;
