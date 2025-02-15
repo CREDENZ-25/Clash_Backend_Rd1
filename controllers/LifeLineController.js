@@ -48,8 +48,9 @@ async function useGetMoreOrLoseMore(questionId, progressId, userAnswerIndex) {
     if (!question) throw new Error("Question not found");
 
     const { answerIdx, points } = question;
+    
     const isCorrect = userAnswerIndex === answerIdx;
-    const scoreChange = isCorrect ? points * 2 : points * -2;
+    const scoreChange = isCorrect ? 8  : -4 ;
 
     const progress = await Progress.findByPk(progressId, { transaction });
     if (!progress) throw new Error("Progress record not found");
