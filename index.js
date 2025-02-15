@@ -6,19 +6,12 @@ import userRoutes from './routes/userRoutes.js'
 // import startController from './controllers/startcontroller.js'
 // import leaderBoardRoute from './routes/leaderBoardRoute.js'
 // import authMiddleware from './middlewares/authMiddleware.js';
-// import qscontroller from './controllers/qsController.js'
+// import qscontroller from './controllers/qscontroller.js'
 dotenv.config();
 import cookieParser from 'cookie-parser';
 
 
 const app = express();
-
-// Test the database connection
-sequelize
-  .authenticate() 
-  .then(() => console.log('Database connected successfully!'))
-  .catch((err) => console.error('Error connecting to the database:', err));
-
 
 // Middleware
 app.use(cookieParser());
