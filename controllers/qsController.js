@@ -1,134 +1,150 @@
-import MCQ from '../models/mcq';
-import Progress from '../models/progress';
-import cookieParser from 'cookie-parser';
+import { QuestionModel } from "../config/db.js";
+import { ProgressModel } from "../config/db.js";
 
-app.use(cookieParser());
+const next = async (req, res) => {
+  // console.log("NEXT!!!");
+  const answer = req.body.answer;  
+  if(answer==null){
+    return res.status(500).json({error:"Error Null Value"});
+  }
+  try {
+    const userId = req.user.userId;
+    if (!userId) {
+      return res.status(400).json({ message: "User ID not found!" });
+    }
 
-const nextButtonHandler = async (req, res) => {
-    const { answer } = req.body;  
+    let userData;
     try {
-        const user = req.user;  
-        const final_counter = await fetchCounterByUser(user);
-        const final_qarray = await fetchQuestionByUser(user);
-        const selected_ans = await fetchAnswerByUser(user);
-        const correct_ans = await fetchCorrectAnsByUser(user);
-        const isUsedLifelines = await fetchUsedLifelines(user);
-        const userMarks = await fetchUserMarks(user);
+      userData = await ProgressModel.findOne({
+        attributes: ["Counter", "Questionsid", "Selectedans", "Correctans", "Marks","createdAt","Corrects"],
+        where: {
+          userid: userId,
+        },
+      });
 
-        const check = final_counter - 1;
-        const currentQuestionId = final_qarray[check];
+      if (!userData) {
+        return res.status(404).json({ message: "User progress not found!" });
+      }
+    } catch (error) {
+      console.error("Error fetching user progress:", error);
+      return res.status(500).json({ message: "Error fetching user progress" });
+    }
 
-        // Save user's selected answer
-        selected_ans[check] = answer;
-        await Progress.update(
-            { Selectedans: selected_ans },
-            { where: { userid: user.id } }
+    const correct_array = userData.Correctans;
+    const selected_array = userData.Selectedans;
+    const question_array = userData.Questionsid;
+    const counter = userData.Counter;
+    const isUsed5050=userData.isUsed5050;
+    const isUsedGamble=userData.isUsedGamble;
+    const isUsedDoubleDip=userData.isUsedDoubleDip;
+
+    let Marks = userData.Marks;
+   
+    
+  
+
+    // console.log(correct_array, selected_array, question_array, counter);
+    const check = correct_array[counter];
+    // console.log(check);
+
+    try {
+      
+        if (userData.isUsedDoubleDip) {
+            let isFirstGuessCorrect =check ===answer ;
+      
+            if (isFirstGuessCorrect) {
+              await ProgressModel.update(
+                { Marks: Marks + 4, isUsedDoubleDip: false },
+                { where: { userid: userId } }
+              );
+              return res.json({ success: true, message: "Correct answer!" });
+            } else {
+                await ProgressModel.update(
+                    { isUsedDoubleDip: false },
+                    { where: { userid: userId } }
+                  );
+              return res.json({ success: false, message: "First guess was wrong. You have one more chance!" });
+            }
+          }
+        if (String(check) === String(answer)) {
+
+              await ProgressModel.update(
+              { Marks: Marks + 4, Selectedans: [...selected_array, answer], Counter: counter + 1,Corrects: userData.Corrects+1 },
+               { where: { userid: userId } },
+
+               Marks=Marks+4
         );
+      } else {
+        await ProgressModel.update(
+          { Marks: Marks - 1, Selectedans: [...selected_array, answer], Counter: counter + 1 },
+          { where: { userid: userId } },
 
-        // Check if the lifeline was used for this question
-        const lifelineUsed = isUsedLifelines.includes(currentQuestionId);
-
-        if (!lifelineUsed) {  
-            let updatedMarks = userMarks;
-            updatedMarks += (answer === correct_ans[check]) ? 4 : -1;
-
-            await Progress.update({ Marks: updatedMarks }, { where: { userid: user.id } });
-        }
-
-        // Move to next question
-        const updatedCounter = final_counter + 1;
-        await Progress.update({ counter: updatedCounter }, { where: { userid: user.id } });
-
-        // Fetch next question
-        const nextQuestionId = final_qarray[updatedCounter];
-        const nextQuestion = await MCQ.findOne({ attributes: ['questions', 'options'], where: { id: nextQuestionId } });
-
-        if (!nextQuestion) return res.status(404).json({ message: "Next question not found" });
-
-        res.status(200).json({ question_data: nextQuestion });
+          Marks=Marks-1
+        );
+      }
+      
     } catch (error) {
-        console.error("Error in nextButtonHandler:", error);
-        res.status(500).json({ message: "Server error" });
+      console.error("Unable to update progress:", error);
+      return res.status(500).json({ message: "Error updating progress" });
     }
+
+    let question_data;
+    let marksData;
+    if (counter===3){return res.status(202).json('Questions over');}
+    let optionsObject=null;
+    try {
+      const qid = userData.Questionsid[counter + 1];
+      question_data = await QuestionModel.findOne({
+        attributes: ["questions", "options"],  //0 :new york
+        where: { id: qid },
+      });
+
+      optionsObject = {
+        0: question_data.options[0], 
+        1: question_data.options[1],
+        2: question_data.options[2],
+        3: question_data.options[3],
+    };
+    
+      
+    } catch (error) {
+      console.error("Error fetching next question:", error);
+      return res.status(500).json({ message: "Error fetching next question" });
+    }
+
+    //time update Logic
+
+    var float_time=0;
+        
+      const datetime = userData.createdAt; 
+      console.log(datetime );
+         const created= new Date(datetime).getTime();
+         const updated = Date.now();
+
+        //  console.log(created );
+        //  console.log(updated);
+        //time retrived in milli seconds so divid by 1000
+         float_time= 1800 - ((updated)-(created))/1000 ;
+         var timeleft = Math.round( float_time );
+        //  console.log(timeleft);
+        if (timeleft<=0){return res.status(404).json('Time over');}    
+         console.log("minutes:" , Math.floor(timeleft/60));
+         console.log("seconds:" , timeleft%60);
+
+         
+     return res.status(200).json({
+            nextquestion:question_data.questions,
+            optionsIndex:optionsObject,
+            timedata:timeleft,
+            marks: Marks,
+         });
+
+
+
+  } catch (error) {
+    console.error("Error in next function:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
-// Fetch user progress counter
-async function fetchCounterByUser(user) {
-    try {
-        const progress = await Progress.findOne({ attributes: ['counter'], where: { userid: user.id } });
-
-        if (progress) {
-            const updatedCounter = progress.counter + 1;
-            await Progress.update({ counter: updatedCounter }, { where: { userid: user.id } });
-            return updatedCounter;
-        }
-    } catch (error) {
-        console.error('Error getting counter:', error);
-        throw error;
-    }
-}
-
-// Fetch list of question IDs
-async function fetchQuestionByUser(user) {
-    try {
-        const progress = await Progress.findOne({ attributes: ['Questionsid'], where: { userid: user.id } });
-        return progress ? progress.Questionsid : [];
-    } catch (error) {
-        console.error('Error getting questions:', error);
-        throw error;
-    }
-}
-
-// Fetch user's selected answers
-async function fetchAnswerByUser(user) {
-    try {
-        const progress = await Progress.findOne({ attributes: ['Selectedans'], where: { userid: user.id } });
-        return progress ? progress.Selectedans : [];
-    } catch (error) {
-        console.error('Error getting selected answers:', error);
-        throw error;
-    }
-}
-
-// Fetch correct answers
-async function fetchCorrectAnsByUser(user) {
-    try {
-        const progress = await Progress.findOne({ attributes: ['Correctans'], where: { userid: user.id } });
-        return progress ? progress.Correctans : [];
-    } catch (error) {
-        console.error('Error getting correct answers:', error);
-        throw error;
-    }
-}
-
-// Fetch isUsedLifelines array
-async function fetchUsedLifelines(user) {
-    try {
-        const progress = await Progress.findOne({ attributes: ['isUsedLifelines'], where: { userid: user.id } });
-        return progress ? progress.isUsedLifelines : [-1, -1, -1];
-    } catch (error) {
-        console.error('Error getting used lifelines:', error);
-        throw error;
-    }
-}
-
-// Fetch user's marks
-async function fetchUserMarks(user) {
-    try {
-        const progress = await Progress.findOne({ attributes: ['Marks'], where: { userid: user.id } });
-        return progress ? progress.Marks : 0;
-    } catch (error) {
-        console.error('Error getting user marks:', error);
-        throw error;
-    }
-}
-
-module.exports = {
-    fetchCounterByUser,
-    fetchQuestionByUser,
-    fetchAnswerByUser,
-    fetchCorrectAnsByUser,
-    fetchUsedLifelines,
-    fetchUserMarks,
-    nextButtonHandler
-};
+export default next;

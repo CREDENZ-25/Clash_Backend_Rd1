@@ -1,5 +1,6 @@
 import { Model, DataTypes} from "sequelize";
 
+
 class User extends Model{}
 
 const initUserModel = sequelize => {

@@ -7,7 +7,6 @@ async function getCurrentQuestionId(userId, transaction) {
   if (!progress) throw new Error("Progress record not found");
   return progress.questionIds[progress.counter]; // Get current question ID
 }
-
 async function getCurrentQuestion(userId, transaction) {
   const questionId = await getCurrentQuestionId(userId, transaction);
   const question = await Question.findByPk(questionId, { transaction });
@@ -52,7 +51,7 @@ async function use5050Lifeline(req) {
 /**
  * GetMoreOrLoseMore Lifeline: Doubles or loses double the points based on correctness.
  */
-async function useGetMoreOrLoseMore(req, userAnswerIndex) {
+async function useGamble(req, userAnswerIndex) {
   const transaction = await sequelize.transaction();
   const userId = req.user.id;
 
@@ -127,7 +126,7 @@ const set5050Lifeline =async (req, res) =>
 
   try {
     const progress = await Progress.findOne({ where: { userId }});
-    if (progress.isUsed5050 ==null)
+    if (progress.isUsed5050 ==false)
       return res.status(400).json({ error: `50-50 lifeline already used`});
   progress.isUsed5050=true;
   await progress.update({ isUsed5050:progress.isUsed5050 });
