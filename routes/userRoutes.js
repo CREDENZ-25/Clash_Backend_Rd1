@@ -5,8 +5,8 @@ import qscontroller from '../controllers/qscontroller.js'
 import authMiddleware from '../middlewares/authMiddleware.js';
 import login from '../controllers/logincontroller.js'
 import leaderboard from '../controllers/leaderboardcontroller.js';
-
-
+import  use5050Lifeline from "../controllers/Life50-50Controller.js";
+import GetMoreOrLoseMore from "../controllers/LifeGetmoreController.js";
 router.post('/login', login);
 
 //start the quiz
@@ -25,8 +25,8 @@ router.post("/submit",);
 
 router.post("/",authMiddleware,);
 
-// router.post("/lifeline2",authMiddleware,use5050Lifeline);
+router.post("/lifeline2",authMiddleware,use5050Lifeline);
 
-// router.post("/lifeline3",authMiddleware,GetMoreOrLoseMore);
+router.post("/lifeline3",authMiddleware,GetMoreOrLoseMore);
 
 export default router;
