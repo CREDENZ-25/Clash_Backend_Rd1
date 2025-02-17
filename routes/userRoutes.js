@@ -26,7 +26,7 @@ router.post("/submit",authMiddleware,submit);
 
 router.post("/",authMiddleware,);
 
- router.post("/lifeline2",authMiddleware,use5050Lifeline);
+//  router.post("/lifeline2",authMiddleware,use5050Lifeline);
 
 // router.post("/lifeline3",authMiddleware,GetMoreOrLoseMore);
 
