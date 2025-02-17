@@ -6,41 +6,41 @@ import { ProgressModel } from "../config/db.js";
 dotenv.config();
 
 async function use5050Lifeline(req, res) {
+
+  
   try {
    
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      return res.status(401).json({ error: "Authorization header missing" });
-    }
-
-    const token = authHeader.split(" ")[1];
-    if (!token) {
-      return res.status(401).json({ error: "Token missing" });
-    }
-
-    const secretKey = process.env.JWT_SECRET;
-    const decoded = jwt.verify(token, secretKey);
-    const userId = decoded.userId;
-    console.log("Extracted userId:", userId);
+    const userId = req.user.userId;
 
     const progress = await ProgressModel.findOne({ 
       where: { userid: userId },
-      attributes: ['id', 'Counter'] 
+      attributes: ['id', 'Counter','isUsed5050','Questionsid'] 
     });
+
+    console.log("progress: ", progress);
+
 
     if (!progress) {
       return res.status(404).json({ error: "Progress record not found" });
     }
 
-    const progressId = progress.id;
-    const counter = progress.Counter; 
-    console.log(`ProgressId: ${progressId}, Counter: ${counter}`);
+    if(progress.isUsed5050 === false){
+      return res.status(404).json({ error: "50-50 used" });
+    }
 
+
+    // const progressId = progress.id;
+    const counter = progress.Counter; 
+    console.log("counter : ",counter );
+  
+    // console.log(`ProgressId: ${progressId}, Counter: ${counter}`);
+    const qid = progress.Questionsid[counter]
     const question = await QuestionModel.findOne({
-      where: { id: counter }, 
+      where: { id: qid }, 
       attributes: ['id', 'options', 'correct'] 
     });
 
+    console.log("quesid : ",qid );
     console.log("Fetched Question:", question);
 
     if (!question) {
@@ -66,10 +66,11 @@ async function use5050Lifeline(req, res) {
 
     console.log("Reduced Options:", reducedOptions);
 
-    const isusedlifeline = [...progress.isusedlifeline];
-    isusedlifeline[0] = true;
-    await progress.update({ isusedlifeline });
+    progress.isUsed5050=false;
+    await progress.update({ isUsed5050: false });
 
+
+    
     res.json({  options: reducedOptions });
 
   } catch (error) {
