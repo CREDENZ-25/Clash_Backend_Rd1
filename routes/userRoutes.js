@@ -7,7 +7,7 @@ import login from '../controllers/logincontroller.js'
 import {leaderboard} from '../controllers/leaderboardcontroller.js';
 import submit from '../controllers/submit.js';
 import setDoubleDipLifeline from '../controllers/qscontroller.js';
-
+import  use5050Lifeline from "../controllers/Life50-50Controller.js";
 router.post('/login', login);
 
 //start the quiz
@@ -26,8 +26,7 @@ router.post("/submit",authMiddleware,submit);
 
 router.post("/",authMiddleware,);
 
-
-router.post("/lifelines/DoubleDip",authMiddleware,setDoubleDipLifeline);
+ router.post("/lifeline2",authMiddleware,use5050Lifeline);
 
 // router.post("/lifeline3",authMiddleware,GetMoreOrLoseMore);
 
