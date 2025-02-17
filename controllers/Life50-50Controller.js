@@ -76,6 +76,27 @@ async function use5050Lifeline(req, res) {
     console.error("Error using 50-50 lifeline:", error.message);
     res.status(500).json({ error: error.message });
   }
+
+
+
 }
 
-export default use5050Lifeline;
+const setDoubleDipLifeline =async (req, res) => 
+  {
+    const userId = req.user.id;
+  
+    try {
+      const progress = await Progress.findOne({ where: { userId }});
+      if (progress.isUsedDoubleDip ==null)
+        return res.status(400).json({ error: `Double Dip lifeline already used`});
+    progress.isUsedDoubleDip=true;
+    await progress.update({ isUsedDoubleDip:progress.isUsedDoubleDip });
+  
+    }
+    catch(error){
+        console.error("Error using 50-50 lifeline:", error.message);
+        throw error;
+    }
+  }
+
+export default {use5050Lifeline , setDoubleDipLifeline} ;

@@ -69,7 +69,9 @@ const start = async (req, res) => {
             }
 
     })
+    console.log(c);
     if(!c){
+      console.log("i am here");
       try {
         questions = await QuestionModel.findAll({
           attributes: ['id', 'correct'],
@@ -108,14 +110,15 @@ const start = async (req, res) => {
         const questionId = currentProgress.Questionsid[currentProgress.Counter]; // Questions ID
   
         const questionData = await QuestionModel.findOne({
-  
+          attributes: ["question","options"],
           where: { id: questionId },
         });
   
         if (!questionData) {
           return res.status(404).json({ message: "Question not found!" });
         }
-        const { questions, options } = questionData;
+        console.log("questionData", questionData);
+        const { question, options } = questionData;
   
         optionsObject = {
           "0": questionData.options[0], 
@@ -125,7 +128,7 @@ const start = async (req, res) => {
       };
   
         const timeleft = 1800//30min start time 
-        return res.status(200).json({ questions, optionsObject, timeleft });
+        return res.status(200).json({question, optionsObject, timeleft, "Marks":"0" });
   
       
   
@@ -137,22 +140,34 @@ const start = async (req, res) => {
 
     else{
 
-      const quesid = c.Questionsid[c.Counter];
+      if (c.Counter===c.Questionsid.length){return res.status(202).json('Questions over');}
 
+
+      const quesid = c.Questionsid[c.Counter];
+      console.log("quesid" , quesid);
       const created=new Date(c.createdAt).getTime();
       const updated= new Date(c.updatedAt).getTime();
 
-      float_time= 1800 - ((updated)-(created))/1000 ;
+      
+      const float_time= 1800 - ((updated)-(created))/1000 ;
       var timeleft = Math.round( float_time );
 
-      const finalObject= await MCQ.findOne({
-        attributes:["questions", "options" ],
+      const questionData= await QuestionModel.findOne({
+        attributes:["question", "options" ],
         where:{
           id:quesid,
         }
       })
+      const optionsObject = {
+        "0": questionData.options[0], 
+        "1": questionData.options[1],
+        "2": questionData.options[2],
+        "3": questionData.options[3],
+    };
+
+      const {question,options}=questionData;
       const Marks=c.Marks;
-      return res.status(200).json({ finalObject , timeleft ,Marks });
+      return res.status(200).json({ question,optionsObject , timeleft ,Marks });
     }
 
    
