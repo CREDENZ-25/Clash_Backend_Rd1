@@ -18,7 +18,7 @@ const next = async (req, res) => {
     let userData;
     try {
       userData = await ProgressModel.findOne({
-        attributes: ["Counter", "Questionsid", "Selectedans", "Correctans", "Marks","createdAt","Corrects"],
+        attributes: ["Counter", "Questionsid", "Selectedans", "Correctans", "Marks","createdAt","Corrects","isUsedDoubleDip","isUsedGamble","isUsed5050"],
         where: {
           userid: userId,
         },
@@ -46,36 +46,51 @@ const next = async (req, res) => {
     // console.log(check);
 
     try {
+      console.log('userdata',userData)
 
       if (userData.isUsedDoubleDip) {
+        console.log("isused double dip",userData.isUsedDoubleDip);
+
+        console.log("check",check);
+        console.log('answer',answer);
+
         let isFirstGuessCorrect =check ===answer ;
-  
+        
+        console.log("is correct",isFirstGuessCorrect)
+
         if (isFirstGuessCorrect) {
-          await ProgressModel.update(
+          const new_pg = await ProgressModel.update(
             { Marks: Marks + 4, isUsedDoubleDip: false },
             { where: { userid: userId } }
           );
+
+          console.log("prgress modle1",new_pg)
+
           return res.json({ success: true, message: "Correct answer!" });
         } else {
-            await ProgressModel.update(
+            const new_pg = await ProgressModel.update(
                 { isUsedDoubleDip: false },
                 { where: { userid: userId } }
               );
+
+              console.log("pg2",new_pg)
+
           return res.json({ success: false, message: "First guess was wrong. You have one more chance!" });
         }
       }
 
-
-      
-   
         if (String(check) === String(answer)) {
 
-              await ProgressModel.update(
+              const pg = await ProgressModel.update(
               { Marks: Marks + 4, Selectedans: [...selected_array, answer], Counter: counter + 1,Corrects: userData.Corrects+1 },
                { where: { userid: userId } },
 
                Marks=Marks+4
         );
+
+
+
+        console.log("new pg3",pg)
       } else {
         await ProgressModel.update(
           { Marks: Marks - 1, Selectedans: [...selected_array, answer], Counter: counter + 1 },
@@ -83,6 +98,8 @@ const next = async (req, res) => {
 
           Marks=Marks-1
         );
+
+        
       }
       
     } catch (error) {
