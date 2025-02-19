@@ -20,12 +20,14 @@ const next = async (req, res) => {
       userData = await ProgressModel.findOne({
         // attributes: ["Counter", "Questionsid", "Selectedans", "Correctans", "Marks","createdAt","Corrects","isUsedGamble"],
         where: {
-          userid: userId,
+          userid: user.id,
         },
+        
       });
-
-      if (!userData) {
-        return res.status(404).json({ message: "User progress not found!" });
+  
+      if (qarray) {
+       return qarray;
+        
       }
     } catch (error) {
       console.error("Error fetching user progress:", error);

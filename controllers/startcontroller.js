@@ -10,7 +10,7 @@ const start = async (req, res) => {
     let questions;
     const c = await ProgressModel.findOne({
             where:{
-              userid : user.userId
+                userid:user_id,
             }
 
     })
