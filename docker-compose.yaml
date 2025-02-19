@@ -35,6 +35,7 @@ services:
 
   db:
     image: postgres:16
+    container_name: postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 12345
@@ -58,7 +59,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - db
+      db:
+        condition: service_started
     restart: unless-stopped
 
   nginx:
