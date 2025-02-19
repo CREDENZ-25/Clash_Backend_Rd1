@@ -1,59 +1,3 @@
-
-// import Progress from '../models/progress.js';
-// import express from "express";
-// import cookieParser from 'cookie-parser';
-
-// const app = express();
-// app.use(cookieParser());
-   
-// async function getUser(){
-//     try{
-//         const token = req.cookies.token;
-            
-//         if(!token){
-//          return res.status(400).json({message:"error"});
-//         }
-    
-//         const user= jwt.verify(token , 'your_secret_key');
-    
-//         if(!user){
-//           return res.status(400).json({message:"error"});
-//         }
-//         return user.id;
-//     }catch(error){
-//         console.log("Starting user error", error)
-//     };
-    
-// }
-
-// app.get('/start', async (req,res)=>{
-//     try{
-//         const user_id = getUser();
-//         const qidarray= await Progress.findOne({
-//             attributes: ['Questionsid'],
-//             where:{
-//                 userid:user_id,
-//             }
-//         })
-//         const firstQ=qidarray[0];
-//         const qaObject = await mcq.findOne({
-//             attributes: ['questions','options'],
-//             where:{
-//                 id: firstQ,
-//             }
-//         })
-        
-//         return res.status(200).json(
-//             qaObject
-//         )
-    
-    
-//     }catch(error){
-//         console.log("Error sending first question",error);
-//     }}
-// )
-
-
 import { ProgressModel, UserModel } from "../config/db.js";
 import { QuestionModel } from "../config/db.js";
 import { Sequelize } from 'sequelize';
@@ -63,11 +7,9 @@ const start = async (req, res) => {
     const user = req.user;
     let questions;
     const c = await ProgressModel.findOne({
-            attributes:["Counter","Questionsid", "Marks","createdAt","updatedAt"],
             where:{
-              userid : user.userId
+                userid:user.userId,
             }
-
     })
     console.log(c);
     if(!c){
@@ -86,7 +28,6 @@ const start = async (req, res) => {
       // Array of Question Ids and Correct Options idx 
       const questionIds = questions.map((question) => question.id);
       const correctOptions = questions.map((question) => question.correct);
-      let optionsObject=null;
      
       try {
         // Progress Table Created :)
@@ -98,9 +39,6 @@ const start = async (req, res) => {
           Marks: 0,
           Counter: 0,
           Selectedans: [],
-          Corrects:0,
-          Lifeline:[],
-
         });
   
         if (!currentProgress) {
@@ -117,18 +55,28 @@ const start = async (req, res) => {
         if (!questionData) {
           return res.status(404).json({ message: "Question not found!" });
         }
-        console.log("questionData", questionData);
+
+
         const { question, options } = questionData;
   
-        optionsObject = {
+        const optionsObject = {
           "0": questionData.options[0], 
           "1": questionData.options[1],
           "2": questionData.options[2],
           "3": questionData.options[3],
       };
+
+      const lifelinestatus = {
+        0:currentProgress.isUsedDoubleDip,
+        1:currentProgress.isUsed5050,
+        2:currentProgress.isUsedGamble
+      }
+      const Marks = currentProgress.Marks;
   
         const timeleft = 1800//30min start time 
-        return res.status(200).json({question, optionsObject, timeleft, "Marks":"0" });
+
+        return res.status(200).json({ question, optionsObject, timeleft, Marks , lifelinestatus});
+
   
       
   
@@ -146,28 +94,30 @@ const start = async (req, res) => {
       const quesid = c.Questionsid[c.Counter];
       console.log("quesid" , quesid);
       const created=new Date(c.createdAt).getTime();
-      const updated= new Date(c.updatedAt).getTime();
+      const updated= Date.now();
+      console.log(created,updated)
 
-      
       const float_time= 1800 - ((updated)-(created))/1000 ;
       var timeleft = Math.round( float_time );
 
-      const questionData= await QuestionModel.findOne({
+      const finalObject= await QuestionModel.findOne({
+
         attributes:["question", "options" ],
         where:{
           id:quesid,
         }
       })
-      const optionsObject = {
-        "0": questionData.options[0], 
-        "1": questionData.options[1],
-        "2": questionData.options[2],
-        "3": questionData.options[3],
-    };
 
-      const {question,options}=questionData;
+      const question = finalObject.question;
+      const options = finalObject.options;
       const Marks=c.Marks;
-      return res.status(200).json({ question,optionsObject , timeleft ,Marks });
+      const lifelinestatus = {
+        0:c.isUsedDoubleDip,
+        1:c.isUsed5050,
+        2:c.isUsedGamble
+      }
+      return res.status(200).json({ question,options, timeleft ,Marks, lifelinestatus });
+
     }
 
    
@@ -179,4 +129,4 @@ const start = async (req, res) => {
   }
 };
 
-export default start;
+export default start;
