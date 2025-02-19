@@ -69,10 +69,10 @@ async function use5050Lifeline(req, res) {
     // progress.isUsed5050=false;
     await progress.update({ isUsed5050: false, where: { userid: userId } });
 
-    res.json({ options: reducedOptions });
+    return res.json({ options: reducedOptions });
   } catch (error) {
     console.error("Error using 50-50 lifeline:", error.message);
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
 

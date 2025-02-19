@@ -20,6 +20,9 @@ const toggleuseGamble = async (req, res) => {
       return res.status(404).json({ error: "Progress not found" });
     }
     
+    if(progress.isUsedGamble==false){
+      return res.status(400).json({message:"Gamble is Already used"})
+    }
 
     await ProgressModel.update(
       { isUsedGamble: true },  
@@ -28,11 +31,11 @@ const toggleuseGamble = async (req, res) => {
     
     // console.log("User gamble set to true");
 
-    res.status(200).json({ message: "Gamble status updated" });
+    return res.status(200).json({ message: "Gamble status updated" });
     
   } catch (error) {
     console.error("Gamble Error:", error.message);
-    res.status(400).json({ error: "Gamble Error" });
+    return res.status(400).json({ error: "Gamble Error" });
   }
 };
 
