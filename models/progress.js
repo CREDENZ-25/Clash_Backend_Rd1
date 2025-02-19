@@ -20,11 +20,30 @@ const Progress = (sequelize) => {
     isJunior: {
       type: DataTypes.BOOLEAN,
     },
-    userid: {  
+    userid: {
       type: DataTypes.INTEGER,
-      allownull:false,
-      references:{model :UserModel,key:'userid'}
-    }
+      allownull: false,
+      references: { model: UserModel, key: "userid" },
+    },
+    Corrects: {
+      type: DataTypes.INTEGER,
+      allownull: false,
+    },
+    isUsed5050: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: null,
+    },
+    isUsedGamble: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: null,
+    },
+    isUsedDoubleDip: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: null,
+    },
   });
   return ProgressModel;
 };
