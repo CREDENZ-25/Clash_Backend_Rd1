@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // app.use('/',userRoutes);
 
-app.use('/user', userRoutes);
+app.use('/', userRoutes);
 
 // app.use('/start',authMiddleware,startController);
 // app.use('/next',authMiddleware,qscontroller);
