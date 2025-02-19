@@ -1,3 +1,5 @@
+
+
 import { QuestionModel } from "../config/db.js";
 import { ProgressModel } from "../config/db.js";
 import { useGamble } from "./gambleController.js";
@@ -22,12 +24,13 @@ const next = async (req, res) => {
         // attributes: ["Counter", "Questionsid", "Selectedans", "Correctans", "Marks","createdAt","Corrects","isUsedGamble"],
 
         where: {
-          userid: userId,
+          userid: user.id,
         },
         
       });
-  
+
       
+
     } catch (error) {
       console.error("Error fetching user progress:", error);
       return res.status(500).json({ message: "Error fetching user progress" });
@@ -50,7 +53,9 @@ const next = async (req, res) => {
         await use5050Lifeline(req,res);
       }
       else if (userData.isUsedGamble) {
+
         userData.isUsedGamble=false; 
+
         console.log("Gambling");
         Marks = await useGamble(userId, check, answer);
       } 
@@ -161,6 +166,8 @@ const next = async (req, res) => {
 
     var float_time = 0;
 
+
+
     const datetime = userData.createdAt;
     console.log(datetime);
     const created = new Date(datetime).getTime();
@@ -193,6 +200,7 @@ const next = async (req, res) => {
       marks: Marks,
       lifeline : lifelinestatus
 
+
     });
   } catch (error) {
     console.error("Error in next function:", error);
@@ -200,4 +208,6 @@ const next = async (req, res) => {
   }
 };
 
+
 export default next;
+
