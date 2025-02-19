@@ -1,7 +1,8 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { syncDatabase} from './config/db.js'; 
-import userRoutes from './routes/userRoutes.js'
+import userRoutes from './routes/userRoutes.js';
+import cors from 'cors';
 // import loginRoutes from './routes/loginRoute.js'; 
 // import startController from './controllers/startcontroller.js'
 // import leaderBoardRoute from './routes/leaderBoardRoute.js'
@@ -12,7 +13,11 @@ import cookieParser from 'cookie-parser';
 
 
 const app = express();
-
+app.use(cors({
+  origin:'http://localhost:5173',
+  methods: "GET,POST,PUT,DELETE",
+  credentials:true,
+}));
 // Middleware
 app.use(cookieParser());
 app.use(express.json({strict:false}));

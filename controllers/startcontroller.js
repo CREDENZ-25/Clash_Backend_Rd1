@@ -88,7 +88,7 @@ const start = async (req, res) => {
 
     else{
 
-      if (c.Counter===c.Questionsid.length){return res.status(202).json('Questions over');}
+      if (c.Counter===c.Questionsid.length){return res.status(202).json({ status: 202, message: "Questions over" });}
 
 
       const quesid = c.Questionsid[c.Counter];
@@ -111,12 +111,19 @@ const start = async (req, res) => {
       const question = finalObject.question;
       const options = finalObject.options;
       const Marks=c.Marks;
+      
+      const optionsObject = {
+        "0": finalObject.options[0], 
+        "1": finalObject.options[1],
+        "2": finalObject.options[2],
+        "3": finalObject.options[3],
+    };
       const lifelinestatus = {
         0:c.isUsedDoubleDip,
         1:c.isUsed5050,
         2:c.isUsedGamble
       }
-      return res.status(200).json({ question,options, timeleft ,Marks, lifelinestatus });
+      return res.status(200).json({ question,optionsObject, timeleft ,Marks, lifelinestatus });
 
     }
 

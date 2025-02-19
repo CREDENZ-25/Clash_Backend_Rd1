@@ -15,7 +15,7 @@ import addProblem from '../controllers/addcontroller.js';
 router.post('/login', login);
 
 //start the quiz
-router.post("/start",authMiddleware,start);
+router.get("/start",authMiddleware,start);
 
 //next-button to submit the current mcqs answer and go to the next
 router.post('/next', authMiddleware, qScontroller);

@@ -133,7 +133,7 @@ const next = async (req, res) => {
     let marksData;
 
     if (counter+1 >= question_array.length) {
-      return res.status(202).json("Questions over");
+      return res.status(202).json({ status: 202, message: "Questions over" });
     }
     let optionsObject = null;
     try {
@@ -187,10 +187,10 @@ const next = async (req, res) => {
     console.log(lifelinestatus);
 
     return res.status(200).json({
-      nextquestion: question_data.question,
-      optionsIndex: optionsObject,
-      timedata: timeleft,
-      marks: Marks,
+      question: question_data.question,
+      optionsObject: optionsObject,
+      timeleft: timeleft,
+      Marks: Marks,
       lifeline : lifelinestatus
 
     });
