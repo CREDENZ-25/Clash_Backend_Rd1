@@ -21,7 +21,7 @@ router.get("/start",authMiddleware,start);
 router.post('/next', authMiddleware, qScontroller);
 
 //to view user leaderboard
-router.post("/leaderboard", authMiddleware, leaderboard);
+router.get("/leaderboard", authMiddleware, leaderboard);
 
 //to view user result
 // router.get("/result",);

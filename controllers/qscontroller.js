@@ -22,7 +22,7 @@ const next = async (req, res) => {
         // attributes: ["Counter", "Questionsid", "Selectedans", "Correctans", "Marks","createdAt","Corrects","isUsedGamble"],
 
         where: {
-          userid: userId,
+          userid: user.id,
         },
         
       });
