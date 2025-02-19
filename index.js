@@ -18,10 +18,10 @@ app.use(cookieParser());
 app.use(express.json({strict:false}));
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/',userRoutes);
+// app.use('/',userRoutes);
 
+app.use('/user', userRoutes);
 
-// app.use('/login', loginRoutes);
 // app.use('/start',authMiddleware,startController);
 // app.use('/next',authMiddleware,qscontroller);
 // app.use('/leaderboard',authMiddleware,leaderBoardRoute);

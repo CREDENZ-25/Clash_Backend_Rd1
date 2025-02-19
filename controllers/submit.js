@@ -1,6 +1,7 @@
 import { UserModel } from "../config/db.js";
 import { ProgressModel } from "../config/db.js";
 import { calculateRank } from "../controllers/leaderboardcontroller.js";
+import { where } from "sequelize";
 const submit = async (req, res) => {
   
     const userId = req.user.userId;
@@ -9,6 +10,14 @@ const submit = async (req, res) => {
       return res.status(400).json({ message: "User ID not found!" });
     }
     let submitData;
+    let userdata;
+    
+    userdata = await UserModel.findOne({
+        attributes:["username"],
+        where:{
+            userid: userId
+        }
+    })
 
     submitData= await ProgressModel.findOne({
     attributes:["Counter","Corrects","Marks"],
@@ -24,7 +33,8 @@ const submit = async (req, res) => {
         "Correct Questions": submitData.Corrects,
         "Score": submitData.Marks,
         "Accuracy":accuracy+"%",
-        "Rank":userRank
+        "Rank":userRank,
+        "username" : userdata.username
     });
 };
 

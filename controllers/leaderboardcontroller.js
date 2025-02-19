@@ -7,8 +7,9 @@ const calculateRank = async(userId, isJunior) => {
     let juniorLeaderboard = [];
     let seniorLeaderboard = [];
 
+
     const leaderboardData = await ProgressModel.findAll({
-        attributes: ['userid', 'Marks', 'isJunior','Counter'],
+        attributes: ['userid', 'Marks', 'isJunior','Counter',],
         order: [['Marks', 'DESC']],
         include: [{
             model: UserModel,
@@ -19,7 +20,7 @@ const calculateRank = async(userId, isJunior) => {
     let juniorRank = 0, seniorRank = 0;
     let prevJuniorMarks = null, prevSeniorMarks = null;
     let userRank = null;
-
+    let username ="";
     leaderboardData.forEach((data) => {
         if (data.isJunior) {
             // Rank logic for juniors
@@ -34,6 +35,7 @@ const calculateRank = async(userId, isJunior) => {
 
             if (userId && data.userid === userId && isJunior) {
                 userRank = juniorRank;
+                username=data.users.username;
             }
         } 
         else {
@@ -51,31 +53,35 @@ const calculateRank = async(userId, isJunior) => {
 
             if (userId && data.userid === userId && !isJunior) {
                 userRank = seniorRank;
+                username=data.users.username;
             }
         }
     });
-    console.log(juniorLeaderboard,seniorLeaderboard)
+    console.log(juniorLeaderboard,seniorLeaderboard,username)
     
-    return { juniorLeaderboard, seniorLeaderboard, userRank };
+    return { juniorLeaderboard, seniorLeaderboard, userRank,username };
 };
 const leaderboard = async (req, res) => {
     try {
         const { userId, isJunior } = req.user || {}; 
         console.log(req.user)
         console.log(userId,isJunior);
-        const { juniorLeaderboard, seniorLeaderboard, userRank } = await calculateRank(userId, isJunior);
+        const { juniorLeaderboard, seniorLeaderboard, userRank ,username} = await calculateRank(userId, isJunior);
         // console.log(await calculateRank(userId,isJunior));
         // console.log(juniorLeaderboard, seniorLeaderboard, userRank);
         return res.status(200).json({
             juniorLeaderboard,
             seniorLeaderboard,
             userRank: userId ? userRank : null,
-            isJunior: isJunior
+            isJunior: isJunior,
+            username: username
         });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Internal server error' });
     }
 };
+
 export { leaderboard , calculateRank };
+
 
