@@ -49,11 +49,7 @@ const next = async (req, res) => {
         userData.isUsed5050=false;
         await use5050Lifeline(req,res);
       }
-      else if (userData.isUsedGamble) {
-        userData.isUsedGamble=false; 
-        console.log("Gambling");
-        Marks = await useGamble(userId, check, answer);
-      } 
+      
       
       else if (userData.isUsedDoubleDip) {
         userData.isUsedDoubleDip=false;
@@ -68,8 +64,9 @@ const next = async (req, res) => {
         console.log("is correct",isFirstGuessCorrect)
 
         if (isFirstGuessCorrect) {
+          Marks=Marks+4
           const new_pg = await ProgressModel.update(
-            { Marks: Marks + 4, 
+            { Marks: Marks , 
               isUsedDoubleDip: false,
               Selectedans: [...selected_array, answer],
               Counter:counter+1
@@ -91,6 +88,12 @@ const next = async (req, res) => {
           return res.json({ success: false, message: "First guess was wrong. You have one more chance!" });
         }
       }
+
+      else if (userData.isUsedGamble) {
+        userData.isUsedGamble=false; 
+        console.log("Gambling");
+        Marks = await useGamble(userId, check, answer);
+      } 
       
       else if (String(check) === String(answer)) {
         console.log("Correct!!!");
