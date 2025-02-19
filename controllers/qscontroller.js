@@ -1,4 +1,3 @@
-
 import { QuestionModel } from "../config/db.js";
 import { ProgressModel } from "../config/db.js";
 import { useGamble } from "./gambleController.js";
@@ -28,10 +27,7 @@ const next = async (req, res) => {
         
       });
   
-      if (qarray) {
-       return qarray;
-        
-      }
+      
     } catch (error) {
       console.error("Error fetching user progress:", error);
       return res.status(500).json({ message: "Error fetching user progress" });
@@ -54,7 +50,7 @@ const next = async (req, res) => {
         await use5050Lifeline(req,res);
       }
       else if (userData.isUsedGamble) {
-        userData.isUsedGamble=false;
+        userData.isUsedGamble=false; 
         console.log("Gambling");
         Marks = await useGamble(userId, check, answer);
       } 
@@ -73,7 +69,11 @@ const next = async (req, res) => {
 
         if (isFirstGuessCorrect) {
           const new_pg = await ProgressModel.update(
-            { Marks: Marks + 4, isUsedDoubleDip: false },
+            { Marks: Marks + 4, 
+              isUsedDoubleDip: false,
+              Selectedans: [...selected_array, answer],
+              Counter:counter+1
+            },
             { where: { userid: userId } }
           );
 
@@ -108,7 +108,7 @@ const next = async (req, res) => {
 
 
 
-        console.log("new pg3",pg)
+        // console.log("new pg3",pg)
       } else {
         console.log("Wrong!!!");
         await ProgressModel.update(
@@ -200,6 +200,4 @@ const next = async (req, res) => {
   }
 };
 
-export default next;
-
-
+export default next;

@@ -1,5 +1,5 @@
 // Gamble
-import { where } from "sequelize";
+
 import {ProgressModel} from "../config/db.js";
 
 const toggleuseGamble = async (req, res) => {
@@ -52,7 +52,11 @@ const useGamble = async (userid, correctAnswerIndex, userAnswerIndex) => {
     console.log("Update Marks : ",updatedScore);
 
     await ProgressModel.update(
-      { Marks: updatedScore, isUsedGamble: false },  // Fields to update
+      { Marks: updatedScore, 
+        isUsedGamble: false ,
+        Counter:progress.Counter+1,
+        Selectedans: [...progress.Selectedans,userAnswerIndex],
+      },  // Fields to update
       { where: { userid: userid } }  // Condition
     );
     
