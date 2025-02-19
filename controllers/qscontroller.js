@@ -1,13 +1,14 @@
 
-
 import { QuestionModel } from "../config/db.js";
 import { ProgressModel } from "../config/db.js";
+import { useGamble } from "./gambleController.js";
+import use5050Lifeline from "../controllers/Life50-50Controller.js"
 
 const next = async (req, res) => {
   // console.log("NEXT!!!");
-  const answer = req.body.answer;  
-  if(answer==null){
-    return res.status(500).json({error:"Error Null Value"});
+  const answer = req.body.answer;
+  if (answer == null) {
+    return res.status(500).json({ error: "Error Null Value" });
   }
   try {
     const userId = req.user.userId;
@@ -18,14 +19,18 @@ const next = async (req, res) => {
     let userData;
     try {
       userData = await ProgressModel.findOne({
-        attributes: ["Counter", "Questionsid", "Selectedans", "Correctans", "Marks","createdAt","Corrects","isUsedDoubleDip","isUsedGamble","isUsed5050"],
-        where: {
-          userid: userId,
-        },
-      });
 
-      if (!userData) {
-        return res.status(404).json({ message: "User progress not found!" });
+        // attributes: ["Counter", "Questionsid", "Selectedans", "Correctans", "Marks","createdAt","Corrects","isUsedGamble"],
+
+        where: {
+          userid: user.id,
+        },
+        
+      });
+  
+      if (qarray) {
+       return qarray;
+        
       }
     } catch (error) {
       console.error("Error fetching user progress:", error);
@@ -37,22 +42,30 @@ const next = async (req, res) => {
     const question_array = userData.Questionsid;
     const counter = userData.Counter;
     let Marks = userData.Marks;
-   
-    
-  
 
     // console.log(correct_array, selected_array, question_array, counter);
     const check = correct_array[counter];
     // console.log(check);
 
     try {
-      console.log('userdata',userData)
 
-      if (userData.isUsedDoubleDip) {
+      if(userData.isUsed5050){
+        userData.isUsed5050=false;
+        await use5050Lifeline(req,res);
+      }
+      else if (userData.isUsedGamble) {
+        userData.isUsedGamble=false;
+        console.log("Gambling");
+        Marks = await useGamble(userId, check, answer);
+      } 
+      
+      else if (userData.isUsedDoubleDip) {
+        userData.isUsedDoubleDip=false;
         console.log("isused double dip",userData.isUsedDoubleDip);
 
         console.log("check",check);
         console.log('answer',answer);
+
 
         let isFirstGuessCorrect =check ===answer ;
         
@@ -65,8 +78,8 @@ const next = async (req, res) => {
           );
 
           console.log("prgress modle1",new_pg)
-
-          return res.json({ success: true, message: "Correct answer!" });
+          console.log("Opps Lifeline wasted you were right ");
+          // return res.json({ success: true, message: "Correct answer!" });
         } else {
             const new_pg = await ProgressModel.update(
                 { isUsedDoubleDip: false },
@@ -78,30 +91,39 @@ const next = async (req, res) => {
           return res.json({ success: false, message: "First guess was wrong. You have one more chance!" });
         }
       }
+      
+      else if (String(check) === String(answer)) {
+        console.log("Correct!!!");
+        await ProgressModel.update(
+          {
+            Marks: Marks + 4,
+            Selectedans: [...selected_array, answer],
+            Counter: counter + 1,
+            Corrects: userData.Corrects + 1,
+          },
+          { where: { userid: userId } },
 
-        if (String(check) === String(answer)) {
-
-              const pg = await ProgressModel.update(
-              { Marks: Marks + 4, Selectedans: [...selected_array, answer], Counter: counter + 1,Corrects: userData.Corrects+1 },
-               { where: { userid: userId } },
-
-               Marks=Marks+4
+          (Marks = Marks + 4)
         );
 
 
 
         console.log("new pg3",pg)
       } else {
+        console.log("Wrong!!!");
         await ProgressModel.update(
-          { Marks: Marks - 1, Selectedans: [...selected_array, answer], Counter: counter + 1 },
+          {
+            Marks: Marks - 1,
+            Selectedans: [...selected_array, answer],
+            Counter: counter + 1,
+          },
           { where: { userid: userId } },
 
-          Marks=Marks-1
+          (Marks = Marks - 1)
         );
 
         
       }
-      
     } catch (error) {
       console.error("Unable to update progress:", error);
       return res.status(500).json({ message: "Error updating progress" });
@@ -109,22 +131,25 @@ const next = async (req, res) => {
 
     let question_data;
     let marksData;
-    if (counter===userData.Questionsid.length-1){return res.status(202).json('Questions over');}
-    let optionsObject=null;
+
+    if (counter+1 >= question_array.length) {
+      return res.status(202).json("Questions over");
+    }
+    let optionsObject = null;
     try {
       const qid = userData.Questionsid[counter + 1];
       question_data = await QuestionModel.findOne({
-        attributes: ["question", "options"],  //0 :new york
+        attributes: ["question", "options"], //0 :new york
+
         where: { id: qid },
       });
 
       optionsObject = {
-        0: question_data.options[0], 
+        0: question_data.options[0],
         1: question_data.options[1],
         2: question_data.options[2],
         3: question_data.options[3],
-    };
-    
+      };
       
     } catch (error) {
       console.error("Error fetching next question:", error);
@@ -133,33 +158,42 @@ const next = async (req, res) => {
 
     //time update Logic
 
-    var float_time=0;
-        
-      const datetime = userData.createdAt; 
-      console.log(datetime );
-         const created= new Date(datetime).getTime();
-         const updated = Date.now();
 
-        //  console.log(created );
-        //  console.log(updated);
-        //time retrived in milli seconds so divid by 1000
-         float_time= 1800 - ((updated)-(created))/1000 ;
-         var timeleft = Math.round( float_time );
-        //  console.log(timeleft);
-        if (timeleft<=0){return res.status(404).json('Time over');}    
-         console.log("minutes:" , Math.floor(timeleft/60));
-         console.log("seconds:" , timeleft%60);
+    var float_time = 0;
 
-         
-     return res.status(200).json({
-            question:question_data.question,
-            optionsObject:optionsObject,
-            timeleft:timeleft,
-            Marks: Marks,
-         });
+    const datetime = userData.createdAt;
+    console.log(datetime);
+    const created = new Date(datetime).getTime();
+    const updated = Date.now();
+
+    //  console.log(created );
+    //  console.log(updated);
+    //time retrived in milli seconds so divid by 1000
+    float_time = 1800 - (updated - created) / 1000;
+    var timeleft = Math.round(float_time);
+    //  console.log(timeleft);
+    if (timeleft <= 0) {
+      return res.status(404).json("Time over");
+    }
+    console.log("minutes:", Math.floor(timeleft / 60));
+    console.log("seconds:", timeleft % 60);
 
 
+    const lifelinestatus = {
+      0:userData.isUsedDoubleDip,
+      1:userData.isUsed5050,
+      2:userData.isUsedGamble
+    }
+    console.log(lifelinestatus);
 
+    return res.status(200).json({
+      nextquestion: question_data.question,
+      optionsIndex: optionsObject,
+      timedata: timeleft,
+      marks: Marks,
+      lifeline : lifelinestatus
+
+    });
   } catch (error) {
     console.error("Error in next function:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -167,3 +201,5 @@ const next = async (req, res) => {
 };
 
 export default next;
+
+
