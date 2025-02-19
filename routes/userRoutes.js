@@ -9,6 +9,7 @@ import submit from '../controllers/submit.js'
 import  use5050Lifeline from "../controllers/Life50-50Controller.js";
 import {toggleuseGamble} from '../controllers/gambleController.js'
 import {togglesetDoubleDip} from '../controllers/DoubleDipController.js'
+import addProblem from '../controllers/addcontroller.js';
 
 // import GetMoreOrLoseMore from "../controllers/LifeGetmoreController.js";
 router.post('/login', login);
