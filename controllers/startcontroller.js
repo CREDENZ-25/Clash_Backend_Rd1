@@ -1,5 +1,4 @@
 
-
 import { ProgressModel, UserModel } from "../config/db.js";
 import { QuestionModel } from "../config/db.js";
 import { Sequelize } from 'sequelize';
@@ -10,9 +9,10 @@ const start = async (req, res) => {
     let questions;
     const c = await ProgressModel.findOne({
             where:{
-                userid:user_id,
-            }
 
+                userid:user.userId,
+
+            }
     })
     console.log(c);
     if(!c){
@@ -132,4 +132,4 @@ const start = async (req, res) => {
   }
 };
 
-export default start;
+export default start;
