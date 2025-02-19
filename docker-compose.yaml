@@ -38,14 +38,14 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 12345
-      POSTGRES_DB: rc_db
+      POSTGRES_DB: clash_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d rc_db"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d clash_db"]
       interval: 10s
       timeout: 5s
       retries: 5
