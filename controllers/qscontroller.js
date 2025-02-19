@@ -1,3 +1,4 @@
+
 import { QuestionModel } from "../config/db.js";
 import { ProgressModel } from "../config/db.js";
 import { useGamble } from "./gambleController.js";
@@ -18,7 +19,9 @@ const next = async (req, res) => {
     let userData;
     try {
       userData = await ProgressModel.findOne({
+
         // attributes: ["Counter", "Questionsid", "Selectedans", "Correctans", "Marks","createdAt","Corrects","isUsedGamble"],
+
         where: {
           userid: user.id,
         },
@@ -45,6 +48,7 @@ const next = async (req, res) => {
     // console.log(check);
 
     try {
+
       if(userData.isUsed5050){
         userData.isUsed5050=false;
         await use5050Lifeline(req,res);
@@ -61,6 +65,7 @@ const next = async (req, res) => {
 
         console.log("check",check);
         console.log('answer',answer);
+
 
         let isFirstGuessCorrect =check ===answer ;
         
@@ -100,6 +105,10 @@ const next = async (req, res) => {
 
           (Marks = Marks + 4)
         );
+
+
+
+        console.log("new pg3",pg)
       } else {
         console.log("Wrong!!!");
         await ProgressModel.update(
@@ -112,6 +121,8 @@ const next = async (req, res) => {
 
           (Marks = Marks - 1)
         );
+
+        
       }
     } catch (error) {
       console.error("Unable to update progress:", error);
@@ -120,6 +131,7 @@ const next = async (req, res) => {
 
     let question_data;
     let marksData;
+
     if (counter+1 >= question_array.length) {
       return res.status(202).json("Questions over");
     }
@@ -128,6 +140,7 @@ const next = async (req, res) => {
       const qid = userData.Questionsid[counter + 1];
       question_data = await QuestionModel.findOne({
         attributes: ["question", "options"], //0 :new york
+
         where: { id: qid },
       });
 
@@ -144,6 +157,7 @@ const next = async (req, res) => {
     }
 
     //time update Logic
+
 
     var float_time = 0;
 
@@ -163,6 +177,7 @@ const next = async (req, res) => {
     }
     console.log("minutes:", Math.floor(timeleft / 60));
     console.log("seconds:", timeleft % 60);
+
 
     const lifelinestatus = {
       0:userData.isUsedDoubleDip,

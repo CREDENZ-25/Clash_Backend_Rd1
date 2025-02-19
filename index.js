@@ -30,7 +30,7 @@ app.use('/', userRoutes);
 app.get('/', (req, res) => {
   res.send('Server is up and running!');
 });
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5002;
 
 // Start the server
 app.listen(PORT, async () => {

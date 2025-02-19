@@ -14,7 +14,9 @@ const start = async (req, res) => {
             }
 
     })
+    console.log(c);
     if(!c){
+      console.log("i am here");
       try {
         questions = await QuestionModel.findAll({
           attributes: ['id', 'correct'],
@@ -49,13 +51,15 @@ const start = async (req, res) => {
         const questionId = currentProgress.Questionsid[currentProgress.Counter]; // Questions ID
   
         const questionData = await QuestionModel.findOne({
-  
+          attributes: ["question","options"],
           where: { id: questionId },
         });
   
         if (!questionData) {
           return res.status(404).json({ message: "Question not found!" });
         }
+
+
         const { question, options } = questionData;
   
         const optionsObject = {
@@ -73,7 +77,9 @@ const start = async (req, res) => {
       const Marks = currentProgress.Marks;
   
         const timeleft = 1800//30min start time 
+
         return res.status(200).json({ question, optionsObject, timeleft, Marks , lifelinestatus});
+
   
       
   
@@ -85,8 +91,11 @@ const start = async (req, res) => {
 
     else{
 
-      const quesid = c.Questionsid[c.Counter];
+      if (c.Counter===c.Questionsid.length){return res.status(202).json('Questions over');}
 
+
+      const quesid = c.Questionsid[c.Counter];
+      console.log("quesid" , quesid);
       const created=new Date(c.createdAt).getTime();
       const updated= Date.now();
       console.log(created,updated)
@@ -95,11 +104,13 @@ const start = async (req, res) => {
       var timeleft = Math.round( float_time );
 
       const finalObject= await QuestionModel.findOne({
+
         attributes:["question", "options" ],
         where:{
           id:quesid,
         }
       })
+
       const question = finalObject.question;
       const options = finalObject.options;
       const Marks=c.Marks;
@@ -109,6 +120,7 @@ const start = async (req, res) => {
         2:c.isUsedGamble
       }
       return res.status(200).json({ question,options, timeleft ,Marks, lifelinestatus });
+
     }
 
    
