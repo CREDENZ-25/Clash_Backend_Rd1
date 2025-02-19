@@ -22,7 +22,7 @@ const next = async (req, res) => {
         // attributes: ["Counter", "Questionsid", "Selectedans", "Correctans", "Marks","createdAt","Corrects","isUsedGamble"],
 
         where: {
-          userid: user.id,
+          userid: userId,
         },
         
       });
@@ -133,7 +133,7 @@ const next = async (req, res) => {
     let marksData;
 
     if (counter+1 >= question_array.length) {
-      return res.status(202).json({ status: 202, message: "Questions over" });
+      return res.status(202).json({status:202,message:"Questions over"});
     }
     let optionsObject = null;
     try {
